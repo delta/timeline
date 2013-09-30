@@ -1,6 +1,7 @@
 Status
 ======
-  * Yet to be completed
+  * Yet to be completed.
+
 Timeline
 ========
   * Year based(normal and academic).
@@ -18,6 +19,7 @@ Timeline
   * Multiple Select Hashtags(Primary)
   * Multiple Select Hashtags(Secondary)(Non Editable)<br/>
      &nbsp;&nbsp;&nbsp; [People with secondary hashtag permission and without primary hastag permission cannot remove it.]
+
 ##ToDO
   * Content 
   * Graph Implementation(All graphs)
