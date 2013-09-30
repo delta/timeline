@@ -37,18 +37,19 @@ $WARNINGSTRING = "";
 $INFOSTRING = "";
 $ERRORSTRING = "";
 /// Contains functions which are common to many tasks and very frequently used.
-require_once($sourceFolder."/common.lib.php");
+require_once($sourceFolder."/query.lib.php");
 
 /// connect to Database
 connectDB();
 
 
 /// Include all required libraries
-require_once($sourceFolder."/graph.lib.php");
-require_once($sourceFolder."/authenticate.lib.php");
+require_once($sourceFolder."/common.lib.php");
 require_once($sourceFolder."/parser.lib.php");
 require_once($sourceFolder."/template.lib.php");
-require_once($sourceFolder."/admin.lib.php");
+require_once($sourceFolder."/tags.lib.php");
+require_once($sourceFolder."/permission.lib.php");
+
 parseAddress();
 /// Get The template from template.lib.php
 if(!getTemplate()) {

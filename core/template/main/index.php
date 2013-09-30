@@ -21,9 +21,9 @@ global $scriptFolder;
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>codechecker</title>
-		<meta name="description" content="codechecker"/>
-		<meta name="keywords" content="codechecker"/>
+		<title>TimeLine</title>
+		<meta name="description" content="TimeLine"/>
+		<meta name="keywords" content="TimeLine"/>
 		<link href="<?php echo $scriptFolder.'/common/bootstrap/css/bootstrap-responsive.min.css'; ?>" type="text/css" rel="stylesheet"/>
 		<link href="<?php echo $scriptFolder.'/common/bootstrap/css/bootstrap.min.css'; ?>" type="text/css" rel="stylesheet"/>
 

@@ -21,6 +21,14 @@ if(!defined('__TIMELINE__')) {
  * Can be used for Array Variables(Like POST,GET)
  * Or for a single variable.	
  */
+
+/** used for Connection to Database */
+function connectDB() {
+	$dbase = mysql_connect(MYSQL_SERVER, MYSQL_USERNAME, MYSQL_PASSWORD) or die("Could not connect to server");
+	mysql_select_db(MYSQL_DATABASE) or die("Could not connect to database");
+	return $dbase;
+}
+
 function escape(&$variable) {
   if(is_array($variable)) {
     foreach($variable as $key => $value) {
@@ -32,7 +40,7 @@ function escape(&$variable) {
 }
 
 function mysqlQuery($query) {
-  $res = mysql_query($query) or or displayerror(mysql_error());
+  $res = mysql_query($query) or displayerror(mysql_error());
   if(!$res) return false;
   return $res; 
 }

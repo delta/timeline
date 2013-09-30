@@ -17,6 +17,7 @@ if(!defined('__TIMELINE__')) {
  */
 
 function createGroup($groupName) {
+
 }   
 
 function deleteGroup($groupId) {
@@ -25,6 +26,10 @@ function deleteGroup($groupId) {
 
 function updateGroup($groupId,$groupName="",$groupDescription="") {
 
+}
+
+function addUserToGroup() {
+        
 }
 
 function createGroupForm() {
@@ -37,6 +42,10 @@ function deleteGroupForm() {
 
 function updateGroupForm() {
 
+}
+
+function addUserToGroupForm() {
+        
 }
 
 ?>

@@ -19,12 +19,6 @@ if(!defined('__TIMELINE__')) {
 /// All Frequently used functions 
 /// will be handled by this file
 
-/** used for Connection to Database */
-function connectDB() {
-	$dbase = mysql_connect(MYSQL_SERVER, MYSQL_USERNAME, MYSQL_PASSWORD) or die("Could not connect to server");
-	mysql_select_db(MYSQL_DATABASE) or die("Could not connect to database");
-	return $dbase;
-}
 
 function displayerror($error_desc) {
 	global $ERRORSTRING;

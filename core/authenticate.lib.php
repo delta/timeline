@@ -15,3 +15,15 @@ if(!defined('__TIMELINE__')) {
  * Author 	: Vivekanandan
  * Concept	: Tracks activity over the years
  */
+
+
+function loginUser() {
+  escape($_POST);
+}
+
+function resetPassword() {
+  escape($_POST);
+  /// validate if password can be reset(like openid-can't be reset),email exist
+}
+
+

@@ -1,3 +1,6 @@
+Status
+======
+  * Yet to be completed
 Timeline
 ========
   * Year based(normal and academic).
@@ -19,4 +22,3 @@ Timeline
   * Content 
   * Graph Implementation(All graphs)
   * Login(OpenId,Normal,webmail)
-  * 
