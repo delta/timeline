@@ -29,6 +29,11 @@ if($config !== "configured") {
   exit(0);
 }
 
+/// User Id will be 0 by default.
+$userId=0;
+if(isset($_SESSION['userId'])) {
+  $userId=$_SESSION['userId'];
+}
 /// This will be content of questions or login page.
 $CONTENT = "";
 
@@ -48,7 +53,7 @@ require_once($sourceFolder."/common.lib.php");
 require_once($sourceFolder."/parser.lib.php");
 require_once($sourceFolder."/template.lib.php");
 require_once($sourceFolder."/tags.lib.php");
-require_once($sourceFolder."/permission.lib.php");
+require_once($sourceFolder."/permissions.lib.php");
 
 parseAddress();
 /// Get The template from template.lib.php
