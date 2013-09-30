@@ -16,9 +16,27 @@ if(!defined('__TIMELINE__')) {
  * Concept	: Tracks activity over the years
  */
 
-///  This page will manage tags,groups(create and add  
-///  users to groups) ,set permissions to groups
-///  (Primary,Secondary)-tags.
+function createGroup($groupName) {
+}   
 
-   
+function deleteGroup($groupId) {
+
+} 
+
+function updateGroup($groupId,$groupName="",$groupDescription="") {
+
+}
+
+function createGroupForm() {
+
+}
+
+function deleteGroupForm() {
+
+}
+
+function updateGroupForm() {
+
+}
+
 ?>

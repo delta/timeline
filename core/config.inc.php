@@ -65,8 +65,11 @@ ini_set('display_errors', 0);
 **/
 $sessdir = $sourceFolder."/uploads/sessions";
 if (!is_dir($sessdir)) { mkdir($sessdir, 0777); }
+if (!is_dir($sessdir)) {
+  echo "Check Permissions for uploads folder in ".$sourceFolder."/uploads"."<br/>It should be 755 with apache user as owner";
+  exit();
+}
 ini_set('session.save_path', $sessdir);
 if(session_id() == '') session_start();
-
 return "configured";
 ?>
