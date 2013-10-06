@@ -22,7 +22,7 @@ function parseAddress() {
   $timelinePath=mapAddress();
   $pagePathArr=explode("/",$_GET['page']);
   print_r($pagePathArr);
-  if(in_array(
+  //  if(in_array(
 }
 
 function mapAddress() {
