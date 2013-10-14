@@ -18,6 +18,16 @@ if(!defined('__TIMELINE__')) {
 
 /// Url Should be handled here
 function parseAddress() {
-	print_r($_GET);
+  print_r($_GET);
+  $timelinePath=mapAddress();
+  $pagePathArr=explode("/",$_GET['page']);
+  print_r($pagePathArr);
+  //  if(in_array(
+}
 
+function mapAddress() {
+  $timelinePath=array(
+		       "login" => "authenticate.lib.php",
+                       ""      => "");
+  return $timelinePath;
 }
