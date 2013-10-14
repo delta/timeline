@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #datePicker{
+        width: 700px;
+        height: 500px;
+        overflow: hidden;
+        position: absolute;
+        left:350px;
+        top:120px;
+      }
+      #datePicker div {
+        font-size: 75%;
+        color: white;
+        background-color:black;
+        border: 1px solid #888;
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input type='button' value='left' onclick='move1(1)'>
+    <input type='button' value='right' onclick='move1(-1)'>
+    <input type='button' value='back' onclick='back()'>
+    <div id='datePicker'>
+    </div>
+    <script src="js/move.js"></script>
+    <script>
+    //these variable are assigned only after a user clicks that partiuclar year or month or day...only when the user click 2012 ..currentYear=2012
+    var currentDay=null,currentMonth=null,currentYear=null;
+    var divs;
+    //each div is assosiated to this multiplier...multiplier[n] will give the relative properties of the nth div...like 1/n opacity
+    var multiplier=Array();
+    var time = '0.5s';
+    //init_buffer is the default buffer of all days and months from 2000 to 2013
+    var init_buffer=Array();
+    var current_display_block;
+    //current buffer is the specific days which the backend replies for our queries...
+    var current_buffer;
+   /* var current_buffer=[
+      {
+        "year":2007,
+        "month":5,
+        "day":12,
+      },
+      {
+        "year":2012,
+        "month":3,
+        "day":4
+      },
+      {
+        "year":2012,
+        "month":5,
+        "day":12
+      },
+      {
+        "year":2012,
+        "month":7,
+        "day":12
+      },
+      {
+        "year":2012,
+        "month":8,
+        "day":12
+      },
+      {
+        "year":2012,
+        "month":8,
+        "day":17
+      },
+      {
+        "year":2012,
+        "month":8,
+        "day":21
+      },
+      {
+        "year":null,
+        "month":null,
+        "day":null
+      }
+    ];*/
+    createDivs(current_buffer);
+    Init();
+    //the below function inits the divs with proper multipliers...alter argument can be used to alter the multiplier such that we can change which div is in display by defeault..if alter=0,the middle div is active...so if u want the 2nd on left from middle to be highlighted...give alter = -2
+    function Init(alter=0){
+    divs = document.getElementById('datePicker').getElementsByTagName('div');
+    var temp = -1*divs.length/2;
+    temp=Math.ceil(temp);
+    for(var i=0;i<divs.length;++i,temp++){
+      divs[i].style.left=280+'px';
+      divs[i].style.top=230+'px';
+      if(temp<-4||temp>4)
+        divs[i].style.display='none';
+
+      multiplier[i]=temp-alter;
+  }
+  move1(0);
+  //the below was done for some look issues
+  for(var i=0;i<divs.length;++i)
+    divs[i].style.display='block';
+}
+//move function is used to move or position the divs....we move the divs around by changing their corresponding values in the multiplier...therefore the addition argument...if argument=0 there is no change in position of blocks...if it is =1 then the whole thing displces by 1...the -1 for the other side...it can 2,3,4... 
+    function move1(addition){
+        //below condition so that it doesnt move when it reaches the end
+        if((multiplier[0]==0&&addition==1)||(multiplier[divs.length-1]==0&&addition==-1))
+          return;
+        for(var i=0;i<divs.length;++i){
+          multiplier[i]=multiplier[i]+addition;
+          //we are changing the properties of the divs according to their value in the multiplier ml-marginleft mt-margin-top
+        var ml = multiplier[i]*100;
+        var mt = Math.abs(multiplier[i])*-1*60;
+        var angle  = -1*multiplier[i]*20;
+        var width = Math.abs(multiplier[i])*-1*20 +100;
+        var opacity =1;
+        for(var j=Math.abs(multiplier[i]);j!=0;--j)
+          opacity/=2;
+        if(multiplier[i]>0)
+          ml=ml+Math.abs(multiplier[i])*20;
+        if(opacity==1)
+          current_display_block=divs[i];
+        //one thing about move is that u have to feed relative values....relative to the initial position of the div...that is if u want to move a div from 420 to 450..just give .y(30)
+        if(Math.abs(multiplier[i])<=2){
+          move(divs[i])
+              .duration(time)
+              .x(ml)
+              .y(mt)
+              .set('opacity',opacity)
+              .skew(0,angle)
+              .set('width',width)
+              .set('height',100)
+          .end()
+      }
+      else{
+          move(divs[i])
+              .duration(time)
+              .x(ml)
+              .y(mt)
+              .set('opacity',0)
+              .skew(0,angle)
+              .set('width',width)
+              .set('height',100)
+          .end() 
+      }
+    }
+  }
+//implode is used to converge all the divs and destroy all the divs...use it during the transition from one layer to another
+  function implode(){
+    for(var i=0;i<divs.length;++i){
+      move(divs[i])
+              .duration(time)
+              .x(0)
+              .y(0)
+              .set('opacity',0)
+              .skew(0,0)
+              .set('width',100)
+            .end()
+          }
+      var datePicker = document.getElementById('datePicker');
+      while(datePicker.firstChild)
+          datePicker.removeChild(datePicker.firstChild);
+          
+  
+      return;
+  }
+  //new divs for the new layer is created by this function....buffer are used for default or custom divs
+  function createDivs(buffer){
+    if(buffer==null){
+      create_default_init_buffer();
+      buffer=init_buffer;
+    }
+    else{
+      //everything inside this is working fine...dont touch it...if something is wrong with it..ask me!
+      var temp2=Array();
+      for(var i=0;i<buffer.length-1;++i){
+        var temp="continue";
+        if(!currentYear&&buffer[i]["year"]!=buffer[i+1]["year"])
+          temp="year";
+        else if(currentYear&&!currentMonth&&buffer[i]["year"]==currentYear&&(buffer[i]["year"]!=buffer[i+1]["year"]||buffer[i]["month"]!=buffer[i+1]["month"]))
+          temp="month";
+        else if(currentMonth&&!currentDay&&buffer[i]["year"]==currentYear&&buffer[i]["month"]==currentMonth&&(buffer[i]["year"]!=buffer[i+1]["year"]||buffer[i]["month"]!=buffer[i+1]["month"]||buffer[i]["day"]!=buffer[i+1]["day"]))
+          temp="day";
+        if(temp=="continue")
+            continue;
+          temp2.push(buffer[i][temp]);
+    }
+      buffer=temp2;
+    }
+    var datePicker = document.getElementById('datePicker');
+    for(var i=0;i<buffer.length;i++){
+      var Div = document.createElement('div');
+      var temp=document.createAttribute('data-meta');
+      temp.value=buffer[i];
+      Div.setAttributeNode(temp);
+      Div.innerHTML=buffer[i];
+      datePicker.appendChild(Div);
+      Div.onclick = function(){
+         this.style.zIndex=100;
+         implode();
+        if(!currentYear){
+          currentYear=this.getAttribute('data-meta');
+          createDivs(current_buffer);
+        }
+        else if(!currentMonth){
+          currentMonth=this.getAttribute('data-meta');
+          createDivs(current_buffer);
+        }
+        else{
+          currentDay=this.getAttribute('data-meta');
+        }
+        Init();
+      }
+    }
+  }
+  var position_buffer;
+  //back is used to go back one layer
+  function back(){
+  position_buffer = currentDay?currentDay:currentMonth?currentMonth:currentYear?currentYear:null; 
+    if(currentDay)
+          currentDay=null;      
+    else{
+      if(currentMonth)
+          currentMonth=null;      
+      else{
+        if(currentYear)
+          currentYear=null;            
+        else{
+          return;
+        }
+      }
+    }
+    implode();
+    createDivs(current_buffer);
+    if(position_buffer){
+        var alter=0;
+        var temp = divs.length/2;
+        temp=Math.abs(Math.ceil(temp));
+        current_block_temp=divs[temp];
+        while(1&&current_block_temp){
+          //alert(current_block_temp.getAttribute('data-meta'));
+        if(parseInt(position_buffer)>parseInt(current_block_temp.getAttribute('data-meta'))){
+          current_block_temp=current_block_temp.nextSibling;
+          alter++;
+        }
+        else if(parseInt(position_buffer)<parseInt(current_block_temp.getAttribute('data-meta'))){
+          current_block_temp=current_block_temp.previousSibling;
+          alter--;
+        }
+        else
+          break;
+      }
+      if(!current_block_temp)
+        alter=0;
+    }
+    Init(alter);
+  }
+  //this is used to create the init_buffer with proper values like leap year and 31,30 shits
+  function create_default_init_buffer(){
+    init_buffer=Array();
+    if(!currentYear){
+      for(var i=2000;i<=2013;i++)
+        init_buffer.push(i);
+    }
+    else if(!currentMonth){
+      for(var i=1;i<=12;++i)
+        init_buffer.push(i);
+    }
+    else{
+      var temp=[0,31,28,31,30,31,30,31,31,30,31,30,31];
+      for (var i = 1; i <=temp[currentMonth]; i++) 
+        init_buffer.push(i);
+      if(currentYear%4==0&&currentMonth==2)
+        init_buffer.push(29);
+    }
+  }
+  //Quick tips:
+  //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so createDivs(buffer)
+  //cool...now u have to Init these divs with Init()...if u want a specific div to be selected by default...set alter accordingly Init(alter)
+  //So the divs are up n for running...before going to next layer...make sure u implode the divs
+  //And if u make a change without commenting...I WILL FIND YOU AND I WILL IMPLODE YOU!.
+  //Happy Hacking!
+    </script>
+  </body>
+</html>
