@@ -43,7 +43,7 @@
     var current_display_block;
     //current buffer is the specific days which the backend replies for our queries...
     var current_buffer;
-    var current_buffer=[
+    /*var current_buffer=[
       {
         "year":2007,
         "month":5,
@@ -85,17 +85,36 @@
         "day":null
       }
     ];
+    var recieved_reply=[
+      {
+        "content_title":null,
+        "content_descp":null,
+        "content_start":'2013-11-29 12:41:24',
+        "content_end":'2013-12-2 12:41:24'
+      },
+      {
+        "content_start":'2013-3-9 12:41:24',
+        "content_end":'2013-3-13 12:41:24' 
+      },
+      {
+        "content_start":'2013-3-12 12:41:24',
+        "content_end":'2013-3-15 12:41:24' 
+      }
+    ];
+    Parse_Reply_Backend(recieved_reply);*/
     Call_Logic(current_buffer);
     Init();
     //the below function inits the divs with proper multipliers...alter argument can be used to alter the multiplier such that we can change which div is in display by defeault..if alter=0,the middle div is active...so if u want the 2nd on left from middle to be highlighted...give alter = -2
-    function Init(alter=0){
+    function Init(alter){
+    if(alter==null)
+      alter=0;
     divs = document.getElementById('datePicker').getElementsByTagName('div');
     var temp = -1*divs.length/2;
     temp=Math.ceil(temp);
     for(var i=0;i<divs.length;++i,temp++){
       divs[i].style.left=400+'px';
       divs[i].style.top=230+'px';
-      if(temp<-3||temp>3)
+      if(temp<-4||temp>4)
         divs[i].style.display='none';
 
       multiplier[i]=temp-alter;
@@ -125,7 +144,7 @@
         if(opacity==1)
           current_display_block=divs[i];
         //one thing about move is that u have to feed relative values....relative to the initial position of the div...that is if u want to move a div from 420 to 450..just give .y(30)
-        if(Math.abs(multiplier[i])<=4){
+        if(Math.abs(multiplier[i])<=3){
           move(divs[i])
               .duration(time)
               .x(ml)
@@ -164,8 +183,6 @@
       var datePicker = document.getElementById('datePicker');
       while(datePicker.firstChild)
           datePicker.removeChild(datePicker.firstChild);
-          
-  
       return;
   }
   //new divs for the new layer is created by this function....buffer are used for default or custom divs
@@ -191,7 +208,6 @@
     }
       buffer=temp2;
     }
-    console.log(buffer);
     //animation call
     createDivs(buffer);
 }
@@ -283,6 +299,41 @@
         init_buffer.push(29);
     }
   }
+  
+  function Parse_Reply_Backend(recieved_reply){
+      current_buffer=[];
+      var temp=0;
+      for(var i=0;i<recieved_reply.length;++i){
+        var temporary_array=[];
+        var t = recieved_reply[i]["content_start"].split(/[- :]/);
+        var start = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+        var t = recieved_reply[i]["content_end"].split(/[- :]/);
+        var end = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+        while(start.getFullYear()!=end.getFullYear()||start.getMonth()!=end.getMonth()||start.getDate()!=(end.getDate()+1)){
+        current_buffer[temp]={};
+        current_buffer[temp]["year"]=start.getFullYear();
+        current_buffer[temp]["month"]=start.getMonth()+1;
+        current_buffer[temp]["day"]=start.getDate();
+        temp++;
+        start.setDate(start.getDate()+1);
+      }
+      }
+      for(var i=0;i<temp;++i){
+        for(var j=0;j<temp-1;++j){
+          var date1 = new Date(current_buffer[j]["year"],current_buffer[j]["month"],current_buffer[j]["day"]);
+          var date2 = new Date(current_buffer[j+1]["year"],current_buffer[j+1]["month"],current_buffer[j+1]["day"]);
+          var temp3={};
+          if(date1>date2){
+            temp3 = current_buffer[j];
+            current_buffer[j]=current_buffer[j+1];
+            current_buffer[j+1]=temp3;
+          }
+        }
+      }
+      current_buffer[temp]={};
+      current_buffer[temp]["year"]=current_buffer[temp]["month"]=current_buffer[temp]["day"]=null;
+      console.log(current_buffer);
+  }  
   //Quick tips:
   //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so Call_Logic(buffer)
   //cool...now u have to Init these divs with Init()...if u want a specific div to be selected by default...set alter accordingly Init(alter)
