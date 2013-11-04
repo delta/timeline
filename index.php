@@ -15,11 +15,9 @@ define("__TIMELINE__", "TIMELINE");
 
 /// Location of source folder
 $sourceFolder = substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'))."/core";
-
 /// Location of Script folder for front end purpose
 $scriptFolder = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'))."/core";
-
-/// If config file is not defined then code will  stop executing
+// If config file is not defined then code will  stop executing
 $config = @include_once($sourceFolder."/config.inc.php");
 
 /// If config file is not defined then code will stop executing

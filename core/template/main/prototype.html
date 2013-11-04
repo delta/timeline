@@ -3,16 +3,18 @@
   <head>
     <style>
       #datePicker{
-        width: 700px;
+        width: 1000px;
         height: 500px;
         overflow: hidden;
         position: absolute;
-        left:350px;
+        left:200px;
         top:120px;
       }
       #datePicker div {
         font-size: 75%;
         color: white;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px 5px #000000;
         background-color:black;
         border: 1px solid #888;
         width: 100px;
@@ -22,7 +24,6 @@
       }
     </style>
   </head>
-
   <body>
     <input type='button' value='left' onclick='move1(1)'>
     <input type='button' value='right' onclick='move1(-1)'>
@@ -42,7 +43,7 @@
     var current_display_block;
     //current buffer is the specific days which the backend replies for our queries...
     var current_buffer;
-   /* var current_buffer=[
+    var current_buffer=[
       {
         "year":2007,
         "month":5,
@@ -83,8 +84,8 @@
         "month":null,
         "day":null
       }
-    ];*/
-    createDivs(current_buffer);
+    ];
+    Call_Logic(current_buffer);
     Init();
     //the below function inits the divs with proper multipliers...alter argument can be used to alter the multiplier such that we can change which div is in display by defeault..if alter=0,the middle div is active...so if u want the 2nd on left from middle to be highlighted...give alter = -2
     function Init(alter=0){
@@ -92,9 +93,9 @@
     var temp = -1*divs.length/2;
     temp=Math.ceil(temp);
     for(var i=0;i<divs.length;++i,temp++){
-      divs[i].style.left=280+'px';
+      divs[i].style.left=400+'px';
       divs[i].style.top=230+'px';
-      if(temp<-4||temp>4)
+      if(temp<-3||temp>3)
         divs[i].style.display='none';
 
       multiplier[i]=temp-alter;
@@ -112,7 +113,7 @@
         for(var i=0;i<divs.length;++i){
           multiplier[i]=multiplier[i]+addition;
           //we are changing the properties of the divs according to their value in the multiplier ml-marginleft mt-margin-top
-        var ml = multiplier[i]*100;
+        var ml = multiplier[i]*130;
         var mt = Math.abs(multiplier[i])*-1*60;
         var angle  = -1*multiplier[i]*20;
         var width = Math.abs(multiplier[i])*-1*20 +100;
@@ -124,7 +125,7 @@
         if(opacity==1)
           current_display_block=divs[i];
         //one thing about move is that u have to feed relative values....relative to the initial position of the div...that is if u want to move a div from 420 to 450..just give .y(30)
-        if(Math.abs(multiplier[i])<=2){
+        if(Math.abs(multiplier[i])<=4){
           move(divs[i])
               .duration(time)
               .x(ml)
@@ -168,7 +169,7 @@
       return;
   }
   //new divs for the new layer is created by this function....buffer are used for default or custom divs
-  function createDivs(buffer){
+  function Call_Logic(buffer){
     if(buffer==null){
       create_default_init_buffer();
       buffer=init_buffer;
@@ -190,6 +191,11 @@
     }
       buffer=temp2;
     }
+    console.log(buffer);
+    //animation call
+    createDivs(buffer);
+}
+  function createDivs(buffer){
     var datePicker = document.getElementById('datePicker');
     for(var i=0;i<buffer.length;i++){
       var Div = document.createElement('div');
@@ -203,11 +209,11 @@
          implode();
         if(!currentYear){
           currentYear=this.getAttribute('data-meta');
-          createDivs(current_buffer);
+          Call_Logic(current_buffer);
         }
         else if(!currentMonth){
           currentMonth=this.getAttribute('data-meta');
-          createDivs(current_buffer);
+          Call_Logic(current_buffer);
         }
         else{
           currentDay=this.getAttribute('data-meta');
@@ -234,7 +240,7 @@
       }
     }
     implode();
-    createDivs(current_buffer);
+    Call_Logic(current_buffer);
     if(position_buffer){
         var alter=0;
         var temp = divs.length/2;
@@ -278,7 +284,7 @@
     }
   }
   //Quick tips:
-  //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so createDivs(buffer)
+  //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so Call_Logic(buffer)
   //cool...now u have to Init these divs with Init()...if u want a specific div to be selected by default...set alter accordingly Init(alter)
   //So the divs are up n for running...before going to next layer...make sure u implode the divs
   //And if u make a change without commenting...I WILL FIND YOU AND I WILL IMPLODE YOU!.

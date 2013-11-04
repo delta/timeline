@@ -25,7 +25,7 @@ define("MYSQL_SERVER","localhost");
 define("MYSQL_USERNAME","root");
 
 // defining the password used to connect to the database.
-define("MYSQL_PASSWORD","root");
+define("MYSQL_PASSWORD","pass");
 
 // defining the name of the database to connect to.
 define("MYSQL_DATABASE","timeline");
