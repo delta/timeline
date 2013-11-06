@@ -4,7 +4,7 @@
     <style>
       #datePicker{
         width: 1000px;
-        height: 500px;
+        height: 600px;
         overflow: hidden;
         position: absolute;
         left:200px;
@@ -31,11 +31,13 @@
     <div id='datePicker'>
     </div>
     <script src="js/move.js"></script>
+    <script src="js/jquery.js"></script>
     <script>
     //these variable are assigned only after a user clicks that partiuclar year or month or day...only when the user click 2012 ..currentYear=2012
     var currentDay=null,currentMonth=null,currentYear=null;
     var divs;
     //each div is assosiated to this multiplier...multiplier[n] will give the relative properties of the nth div...like 1/n opacity
+    var isImploded = false;
     var multiplier=Array();
     var time = '0.5s';
     //init_buffer is the default buffer of all days and months from 2000 to 2013
@@ -103,6 +105,7 @@
     ];
     Parse_Reply_Backend(recieved_reply);*/
     Call_Logic(current_buffer);
+
     Init();
     //the below function inits the divs with proper multipliers...alter argument can be used to alter the multiplier such that we can change which div is in display by defeault..if alter=0,the middle div is active...so if u want the 2nd on left from middle to be highlighted...give alter = -2
     function Init(alter){
@@ -113,8 +116,8 @@
     temp=Math.ceil(temp);
     for(var i=0;i<divs.length;++i,temp++){
       divs[i].style.left=400+'px';
-      divs[i].style.top=230+'px';
-      if(temp<-4||temp>4)
+      divs[i].style.top=320+'px';
+      if((temp-alter)<-4||(temp-alter)>4)
         divs[i].style.display='none';
 
       multiplier[i]=temp-alter;
@@ -133,7 +136,7 @@
           multiplier[i]=multiplier[i]+addition;
           //we are changing the properties of the divs according to their value in the multiplier ml-marginleft mt-margin-top
         var ml = multiplier[i]*130;
-        var mt = Math.abs(multiplier[i])*-1*60;
+        var mt = Math.abs(multiplier[i])*-1*90;
         var angle  = -1*multiplier[i]*20;
         var width = Math.abs(multiplier[i])*-1*20 +100;
         var opacity =1;
@@ -144,7 +147,8 @@
         if(opacity==1)
           current_display_block=divs[i];
         //one thing about move is that u have to feed relative values....relative to the initial position of the div...that is if u want to move a div from 420 to 450..just give .y(30)
-        if(Math.abs(multiplier[i])<=3){
+        if(Math.abs(multiplier[i])>3)
+          opacity=0;
           move(divs[i])
               .duration(time)
               .x(ml)
@@ -154,23 +158,12 @@
               .set('width',width)
               .set('height',100)
           .end()
-      }
-      else{
-          move(divs[i])
-              .duration(time)
-              .x(ml)
-              .y(mt)
-              .set('opacity',0)
-              .skew(0,angle)
-              .set('width',width)
-              .set('height',100)
-          .end() 
-      }
+      
     }
   }
 //implode is used to converge all the divs and destroy all the divs...use it during the transition from one layer to another
   function implode(){
-    for(var i=0;i<divs.length;++i){
+    /*for(var i=0;i<divs.length;++i){
       move(divs[i])
               .duration(time)
               .x(0)
@@ -178,11 +171,24 @@
               .set('opacity',0)
               .skew(0,0)
               .set('width',100)
-            .end()
-          }
-      var datePicker = document.getElementById('datePicker');
-      while(datePicker.firstChild)
-          datePicker.removeChild(datePicker.firstChild);
+            .end()}
+            var forward = current_display_block;
+            if(current_display_block.previousSibling)
+              var backward = current_display_block.previousSibling;
+            var temp1,temp2;
+            while(forward){
+              temp1 = forward.nextSibling;
+              forward.parentNode.removeChild(forward);
+              forward=temp1;
+            }
+            while(backward){
+              temp2 = backward.previousSibling;
+              backward.parentNode.removeChild(backward);
+              backward=temp2;
+            }*/
+            var datePicker = document.getElementById('datePicker');
+            while(datePicker.firstChild)
+              datePicker.removeChild(datePicker.firstChild);
       return;
   }
   //new divs for the new layer is created by this function....buffer are used for default or custom divs
