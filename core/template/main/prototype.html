@@ -32,7 +32,27 @@
     </div>
     <script src="js/move.js"></script>
     <script src="js/jquery.js"></script>
+    <script src="js/underscore.js"></script>
     <script>
+    var initial_click_posx=0;
+    var time_wait=300; //sets time for throttle
+    var pressit= _.throttle(function(e){if(e.keyCode==37) move1(1); else if(e.keyCode==39) move1(-1); else if(e.keyCode==8) back();},time_wait);
+    var holdclick= _.throttle(function(e){if((e.clientX-initial_click_posx)>=100) move1(-1); else if((e.clientX-initial_click_posx)<=-100) move1(1);},300);
+  
+    function clickdown(e)
+    {
+    initial_click_posx=e.clientX;
+    document.addEventListener('mousemove',holdclick);
+    }
+  
+    function clickup(e)
+    {
+    initial_click_posx=0;
+    document.removeEventListener('mousemove',holdclick);
+    }
+    document.addEventListener('keydown',pressit);
+    document.addEventListener('mousedown',clickdown);
+    document.addEventListener('mouseup',clickup);
     //these variable are assigned only after a user clicks that partiuclar year or month or day...only when the user click 2012 ..currentYear=2012
     var currentDay=null,currentMonth=null,currentYear=null;
     var divs;
