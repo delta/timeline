@@ -4,10 +4,10 @@
     <style>
       #datePicker{
         width: 1000px;
-        height: 600px;
+        height: 500px;
         overflow: hidden;
         position: absolute;
-        left:200px;
+        left:180px;
         top:120px;
       }
       body{
@@ -16,8 +16,8 @@
       }
       #datePicker div:nth-child(n+2) {
         vertical-align: middle;
+        font-size: 80%;
         line-height: 100px;
-        font-size: 75%;
         color: black;
         border-radius: 5px;
         box-shadow: 0px 0px 10px 5px #0066FF;
@@ -30,28 +30,25 @@
         font-weight: bold;
       }
       #dateShower{
-        width: 200px;
-        left: 100px;
-        top: 50px;
+        width: 250px;
         height: 30px;
         background-color:#ADD6FF;
         border-radius: 5px;
         box-shadow: 0px 0px 10px 5px #0066FF;
-        left: 350px;
+        left: 375px;
         top: 150px;
         position: absolute;
         text-align: center;
-        line-height: 30px;
+        padding-top: 5px;
+      }
+      #dateShower select{
+        border-radius: 5px;
+        height: 25px;
       }
     </style>
   </head>
   <body>
-    <center>
-    <input type='button' value='left' onclick='move1(1)'>
-    <input type='button' value='right' onclick='move1(-1)'>
-    <input type='button' value='back' onclick='back()'>
-  </center>
-    <div id='datePicker'><div id="dateShower"></div><div style="display:none" data-meta="-1"></div>
+    <div id='datePicker'><div id="dateShower"><select id='manualYear'></select> <select id='manualMonth'></select> <select id='manualDay'></select></div><div style="display:none" data-meta="-1"></div>
     </div>
     <script src="js/move.js"></script>
     <script src="js/jquery.js"></script>
@@ -73,9 +70,12 @@
     initial_click_posx=0;
     document.removeEventListener('mousemove',holdclick);
     }
-    document.addEventListener('keydown',pressit);
+/*    document.addEventListener('keydown',pressit);
     document.addEventListener('mousedown',clickdown);
-    document.addEventListener('mouseup',clickup);
+    document.addEventListener('mouseup',clickup);*/
+    document.getElementById('manualYear').addEventListener('change',Dropbox_Change);
+    document.getElementById('manualMonth').addEventListener('change',Dropbox_Change);
+    document.getElementById('manualDay').addEventListener('change',Dropbox_Change);
     //these variable are assigned only after a user clicks that partiuclar year or month or day...only when the user click 2012 ..currentYear=2012
     var currentDay=null,currentMonth=null,currentYear=null;
     var divs;
@@ -114,8 +114,8 @@
       }
     ];
     Parse_Reply_Backend(recieved_reply);
+    set_dateViewer(current_buffer);
     Call_Logic(current_buffer);
-
     Init();
     //the below function inits the divs with proper multipliers...alter argument can be used to alter the multiplier such that we can change which div is in display by defeault..if alter=0,the middle div is active...so if u want the 2nd on left from middle to be highlighted...give alter = -2
     function Init(alter){
@@ -125,7 +125,7 @@
     var temp = -1*(divs.length-1)/2;
     temp=Math.ceil(temp);
     for(var i=1;i<divs.length;++i,temp++){
-      divs[i].style.left=400+'px';
+      divs[i].style.left=450+'px';
       divs[i].style.top=320+'px';
       if((temp-alter)<-4||(temp-alter)>4){
          divs[i].style.display='none';
@@ -139,23 +139,171 @@
     divs[i].style.display='block';
   }
 }
+//if user uses dropbox to change the date
+function Dropbox_Change(e){
+      if(e){
+      var changed_variable = this.id=="manualDay"?"day":this.id=="manualMonth"?"month":"year"
+      var flag1=false,flag2=false,flag3=false;
+      for(var i=0;i<current_buffer.length;i++){
+        if(current_buffer[i][changed_variable]==this.value){
+          if(current_buffer[i]["day"]==document.getElementById("manualDay").value)
+            flag1=true;
+          if(current_buffer[i]["month"]==document.getElementById("manualMonth").value)
+            flag2=true;
+          if(current_buffer[i]["year"]==document.getElementById("manualYear").value)
+            flag3=true;
+        }
+      }
+      if(!flag1)
+        document.getElementById('daynull').selected="selected";
+      if(!flag2)
+        document.getElementById('monthnull').selected="selected";
+      if(!flag3)
+        document.getElementById('yearnull').selected="selected";
+      else{
+        currentYear=document.getElementById("manualYear").value;
+        if(flag2){
+          currentMonth=document.getElementById("manualMonth").value;
+          if(flag3){
+            currentDay=document.getElementById("manualDay").value;
+            implode();
+          }
+        /*implode();
+        Call_Logic(current_buffer);
+        Init();
+        dropdown_highlighter(document.getElementById('day'),document.getElementById('month'),document.getElementById('year'));
+        return;*/
+        }
+        implode();
+        Call_Logic(current_buffer);
+        Init();
+      }
+      dropdown_highlighter(document.getElementById('manualYear').value,document.getElementById('manualMonth').value,document.getElementById('manualDay').value);
+    }
+    }
+//highlights the possible options in the dropdown menu
+function dropdown_highlighter(query_year,query_month,query_day){
+  $('#dateShower option').css('background-color','white');
+  console.log('yo');
+  if(!(query_year&&query_month&&query_day)){
+    for(var i=0;i<current_buffer.length;i++){
+      if((query_year==current_buffer[i]["year"]||query_year=='')&&(query_month==current_buffer[i]["month"]||query_month=='')&&(query_day==current_buffer[i]["day"]||query_day=='')){
+        document.getElementById('day'+current_buffer[i]["day"]).style.backgroundColor='#99CCFF';
+        document.getElementById('month'+current_buffer[i]["month"]).style.backgroundColor='#99CCFF';
+        document.getElementById('year'+current_buffer[i]["year"]).style.backgroundColor='#99CCFF';
+      }
+    }
+  }
+}
 //used to change the date on top of datepicker
 function change_dateViewer(){
-    var arrayMonth = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var string_date="";
+    var string_day="";
+    var string_month="";
+    var string_year="";
     if(currentDay)
-      string_date=currentDay+" - ";
+      string_day=currentDay;
     else if(currentMonth)
-      string_date=current_display_block.getAttribute("data-meta")+' - ';
-    if(currentMonth)
-      string_date+=arrayMonth[currentMonth-1]+" - ";
-    else if(currentYear)
-      string_date+=arrayMonth[current_display_block.getAttribute("data-meta")-1]+' - ';
-    if(currentYear)
-      string_date+=currentYear;
+      string_day=current_display_block.getAttribute("data-meta");
     else
-      string_date+=current_display_block.getAttribute("data-meta");
-    document.getElementById('dateShower').innerHTML=string_date;
+      string_day="null";
+    if(currentMonth)
+      string_month=currentMonth;
+    else if(currentYear)
+      string_month=current_display_block.getAttribute("data-meta");
+    else
+      string_month="null";
+    if(currentYear)
+      string_year=currentYear;
+    else
+      string_year=current_display_block.getAttribute("data-meta");
+    if(document.getElementById("day"+string_day))
+    document.getElementById("day"+string_day).selected="selected";
+    if(document.getElementById("month"+string_month))
+    document.getElementById("month"+string_month).selected="selected";
+    if(document.getElementById("year"+string_year))
+    document.getElementById("year"+string_year).selected="selected";
+    if(string_year=='null') string_year='';
+    if(string_month=='null') string_month='';
+    if(string_day=='null') string_day='';
+    dropdown_highlighter(string_year,string_month,string_day);
+}
+//You dont wanna know what the fuck this shit does!!!!!!!!!!!!!
+function ParseDate_dateViewer(buffer){
+    var temp1_array=Array();
+    var temp2_array=Array();
+    var temp3_array=Array();
+    var day_buffer=Array(),month_buffer=Array(),year_buffer=Array();  
+    for(var l=0;l<buffer.length;l++)
+        temp1_array.push(buffer[l]["day"]);
+    $.each(temp1_array, function(i, el){
+    if($.inArray(el,day_buffer) === -1) day_buffer.push(el);
+});
+    for(var j=0;j<buffer.length;j++)
+        temp2_array.push(buffer[j]["month"]);
+    $.each(temp2_array, function(i, el){
+    if($.inArray(el,month_buffer) === -1) month_buffer.push(el);
+});
+    for(var k=0;k<buffer.length;k++)
+        temp3_array.push(buffer[k]["year"]);
+    $.each(temp3_array, function(i, el){
+    if($.inArray(el,year_buffer) === -1) year_buffer.push(el);
+});
+    var max = day_buffer.length>month_buffer.length?day_buffer.length:month_buffer.length>year_buffer.length?month_buffer.length:year_buffer.length;
+    for(var x =0;x<max;x++){
+      for(var y=0;y<max;y++){
+        var temp;
+        if(x<day_buffer.length&&y<day_buffer.length&&day_buffer[y]>day_buffer[y+1]){
+          temp=day_buffer[y];
+          day_buffer[y]=day_buffer[y+1];
+          day_buffer[y+1]=temp;
+        }
+        if(x<month_buffer.length&&y<month_buffer.length&&month_buffer[y]>month_buffer[y+1]){
+          temp=month_buffer[y];
+          month_buffer[y]=month_buffer[y+1];
+          month_buffer[y+1]=temp;
+        }
+        if(x<year_buffer.length&&y<year_buffer.length&&year_buffer[y]>year_buffer[y+1]){
+          temp=year_buffer[y];
+          year_buffer[y]=year_buffer[y+1];
+          year_buffer[y+1]=temp;
+        }
+      }
+    }
+    return [day_buffer,month_buffer,year_buffer];
+}
+//sets the options for the dateViewer
+function set_dateViewer(buffer){
+  var day_buffer=Array(),month_buffer=Array(),year_buffer=Array();
+    if(buffer==null){
+      for(var i=1;i<31;i++)
+        day_buffer.push(i);
+      for(var j=1;j<13;j++)
+        month_buffer.push(j)
+      for(var k=2000;k<2014;k++)
+        year_buffer.push(k);
+    }
+    else{
+      var temp_array = ParseDate_dateViewer(buffer);
+      day_buffer=temp_array[0],month_buffer=temp_array[1],year_buffer=temp_array[2];
+    }
+    for(var i=0;i<day_buffer.length;i++){
+      var day = document.createElement('option');
+      day.innerHTML = day_buffer[i];
+      day.id="day"+day_buffer[i];
+      document.getElementById('manualDay').appendChild(day);
+    }
+    for(var j=0;j<month_buffer.length;j++){
+      var month = document.createElement('option');
+      month.innerHTML=month_buffer[j];
+      month.id="month"+month_buffer[j];
+      document.getElementById('manualMonth').appendChild(month);
+    }
+    for(var k=0;k<year_buffer.length;k++){
+      var year = document.createElement('option');
+      year.innerHTML=year_buffer[k];
+      year.id="year"+year_buffer[k];
+      document.getElementById('manualYear').appendChild(year);
+    }
 }
 //move function is used to move or position the divs....we move the divs around by changing their corresponding values in the multiplier...therefore the addition argument...if argument=0 there is no change in position of blocks...if it is =1 then the whole thing displces by 1...the -1 for the other side...it can 2,3,4... 
     function move1(addition){
@@ -195,7 +343,7 @@ function change_dateViewer(){
   }
 //implode is used to converge all the divs and destroy all the divs...use it during the transition from one layer to another
   function implode(){
-    /*for(var i=0;i<divs.length;++i){
+    for(var i=1;i<divs.length;++i){
       move(divs[i])
               .duration(time)
               .x(0)
@@ -203,7 +351,7 @@ function change_dateViewer(){
               .set('opacity',0)
               .skew(0,0)
               .set('width',100)
-            .end()}*/
+            .end()}
             var datePicker = document.getElementById('datePicker');
             while(datePicker.firstChild.nextSibling.nextSibling)
               datePicker.removeChild(datePicker.firstChild.nextSibling.nextSibling);
@@ -306,13 +454,13 @@ function change_dateViewer(){
     Init(alter);
   }
   //this is used to create the init_buffer with proper values like leap year and 31,30 shits
-  function create_default_init_buffer(){
+  function create_default_init_buffer(specific){
     init_buffer=Array();
-    if(!currentYear){
+    if((!currentYear&&specific==null)||specific=="year"){
       for(var i=2000;i<=2013;i++)
         init_buffer.push(i);
     }
-    else if(!currentMonth){
+    else if((!currentMonth&&specific==null)||specific=="month"){
       for(var i=1;i<=12;++i)
         init_buffer.push(i);
     }
@@ -357,8 +505,9 @@ function change_dateViewer(){
       }
       current_buffer[temp]={};
       current_buffer[temp]["year"]=current_buffer[temp]["month"]=current_buffer[temp]["day"]=null;
-      
+    
   }  
+
   //Quick tips:
   //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so Call_Logic(buffer)
   //cool...now u have to Init these divs with Init()...if u want a specific div to be selected by default...set alter accordingly Init(alter)
