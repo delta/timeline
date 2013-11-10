@@ -45,9 +45,24 @@
       #dateShower select{
         height: 25px;
       }
+      #tagPicker{
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        width: 700px;
+        text-align: center;
+      }
+      #tagPicker label{
+        font-size: 13px;
+        color: white;
+        cursor: pointer;
+        margin: 0px 5px 0px 5px;
+        color: #ADD6FF;
+      }
     </style>
   </head>
   <body>
+    <div id="tagPicker"><label id="tagfestember">festember</label><label id="tagpragyan">pragyan</label><label id="tagmidfest">midfest</label></div>
     <div id='datePicker'><div id="dateShower"><select id='manualYear'></select> <select id='manualMonth'></select> <select id='manualDay'></select></div><div style="display:none" data-meta="-1"></div>
     </div>
     <script src="js/move.js"></script>
@@ -91,26 +106,29 @@
     
    var recieved_reply=[
       {
-        "content_title":null,
-        "content_descp":null,
         "content_start":'2013-11-29 12:41:24',
-        "content_end":'2013-12-2 12:41:24'
+        "content_end":'2013-12-2 12:41:24',
+        "primary_hashtag":"festember"
       },
       {
         "content_start":'2013-3-9 12:41:24',
-        "content_end":'2013-3-13 12:41:24' 
+        "content_end":'2013-3-13 12:41:24' ,
+        "primary_hashtag":"festember"
       },
       {
         "content_start":'2013-3-12 12:41:24',
-        "content_end":'2013-3-15 12:41:24' 
+        "content_end":'2013-3-15 12:41:24' ,
+        "primary_hashtag":"pragyan"
       },
       {
         "content_start":'2012-3-12 12:41:24',
-        "content_end":'2012-3-15 12:41:24' 
+        "content_end":'2012-3-15 12:41:24' ,
+        "primary_hashtag":"midfest"
       },
       {
         "content_start":'2014-3-12 12:41:24',
-        "content_end":'2014-3-15 12:41:24' 
+        "content_end":'2014-3-15 12:41:24' ,
+        "primary_hashtag":"pragyan"
       }
     ];
    // Parse_Reply_Backend(recieved_reply);
@@ -118,27 +136,7 @@
     Call_Logic(current_buffer);
     Init();
     //the below function inits the divs with proper multipliers...alter argument can be used to alter the multiplier such that we can change which div is in display by defeault..if alter=0,the middle div is active...so if u want the 2nd on left from middle to be highlighted...give alter = -2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    function Init(alter){
+   function Init(alter){
     if(alter==null)
       alter=0;
     divs = document.getElementById('datePicker').getElementsByTagName('div');
@@ -370,6 +368,7 @@ function set_dateViewer(buffer){
       
     }
     change_dateViewer();
+    highlight_tags();
   }
 //implode is used to converge all the divs and destroy all the divs...use it during the transition from one layer to another
   function implode(){
@@ -512,17 +511,17 @@ function set_dateViewer(buffer){
       current_buffer=[];
       var temp=0;
       for(var i=0;i<recieved_reply.length;++i){
-        var temporary_array=[];
         var t = recieved_reply[i]["content_start"].split(/[- :]/);
         var start = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
         var t = recieved_reply[i]["content_end"].split(/[- :]/);
         var end = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
         while(start.getFullYear()!=end.getFullYear()||start.getMonth()!=end.getMonth()||start.getDate()!=(end.getDate()+1)){
-        current_buffer[temp]={};
-        current_buffer[temp]["year"]=start.getFullYear();
-        current_buffer[temp]["month"]=start.getMonth()+1;
-        current_buffer[temp]["day"]=start.getDate();
-        temp++;
+            current_buffer[temp]={};
+            current_buffer[temp]["year"]=start.getFullYear();
+            current_buffer[temp]["month"]=start.getMonth()+1;
+            current_buffer[temp]["day"]=start.getDate();
+            current_buffer[temp]["id"]=i;
+            temp++;
         start.setDate(start.getDate()+1);
       }
       }
@@ -542,7 +541,107 @@ function set_dateViewer(buffer){
       current_buffer[temp]["year"]=current_buffer[temp]["month"]=current_buffer[temp]["day"]=null;
     
   }  
-
+  //highlights the tags inside a particular date pattern....
+  function highlight_tags(){
+    var bool = false;
+    if(!current_buffer){
+      bool=true;
+      Parse_Reply_Backend(recieved_reply);
+    }
+    $("#tagPicker label").css("font-size","13px");
+    $("#tagPicker label").css("text-shadow","0 0 0.0em #87F");
+    $("#tagPicker label").css("opacity","1");
+    if(currentYear){
+      if(currentMonth){
+        for(var i=0;i<current_buffer.length;i++){
+          if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["day"]){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+          }
+          else{
+           if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&currentDay==current_buffer[i]["day"]){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            $("#tagPicker label").css("opacity","0.5");
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F"); 
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("opacity","1"); 
+          }
+        }
+        }
+      }
+      else{
+        for(var i=0;i<current_buffer.length;i++){
+          if(currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["month"]){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+          }
+        }
+      }
+    }
+    else{
+      for(var i=0;i<current_buffer.length;i++){
+          if(current_display_block.getAttribute("data-meta")==current_buffer[i]["year"]){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+          }
+        }
+    }
+    if(bool)
+      current_buffer=null;
+  }
+  $("#tagPicker label").click(search_primaryTag);
+  //if user clicks the tag,it sends an ajax request and process the reply...
+  function search_primaryTag(){
+    if(this.style.fontWeight!="bold"){
+      this.style.fontWeight="bold";
+      this.style.textDecoration="overline";
+  }
+    else{
+      this.style.fontWeight="";
+      this.style.textDecoration="";   
+    }
+    var tags = document.getElementById("tagPicker").getElementsByTagName("label");
+    var tags_search = Array();
+    for(var i=0;i<tags.length;i++){
+      if(tags[i].style.fontWeight=="bold")
+        tags_search.push(tags[i].id);
+    }
+    var temporary_array=[];
+     if(tags_search){
+        for(var i=0;i<tags_search.length;i++){
+          for(var j=i;j<tags_search.length;j++){
+            if(tags_search[j]>tags_search[j+1]){
+              var temp = tags_search[j];
+              tags_search[j]=tags_search[j+1];
+              tags_search[j+1]=temp;
+            }
+          }
+        }
+        for(var i=0;i<recieved_reply.length;i++){
+            var starting = 0;
+            var ending =tags_search.length-1;
+            while(starting!=ending){
+              var middle =Math.ceil((starting+ending)/2);
+              if(tags_search[middle]>"tag"+recieved_reply[i]["primary_hashtag"])
+                ending=middle-1;
+              else if(tags_search[middle]<"tag"+recieved_reply[i]["primary_hashtag"])
+                starting=middle+1;
+              else
+                starting=ending=middle;
+            }
+            if(tags_search[starting]!="tag"+recieved_reply[i]["primary_hashtag"])
+              continue;
+            temporary_array.push(recieved_reply[i]);
+          }
+      }
+      currentYear=currentMonth=currentDay=null;
+      if(temporary_array.length==0)
+        current_buffer=null;
+      else
+        Parse_Reply_Backend(temporary_array);
+    implode();
+    Call_Logic(current_buffer);
+    Init();
+  }
   //Quick tips:
   //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so Call_Logic(buffer)
   //cool...now u have to Init these divs with Init()...if u want a specific div to be selected by default...set alter accordingly Init(alter)
