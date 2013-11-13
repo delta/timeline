@@ -10,14 +10,28 @@
  * Concept	: Tracks activity over the years
  */
 
-/// Prevent direct access to php files 
+/// Prevent direct access to php files
 define("__TIMELINE__", "TIMELINE");
 
+
+print_r($_SERVER);
+$action="";
+if(isset($_GET['action'])) {
+  $action=$_GET['action'];
+}
 /// Location of source folder
 $sourceFolder = substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'))."/core";
+
+
+echo $_SERVER['SERVER_SIGNATURE'];
+
+echo print_r($_GET)."Hello start here ".$_GET['page'].$sourceFolder;
+
+
 /// Location of Script folder for front end purpose
 $scriptFolder = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'))."/core";
-// If config file is not defined then code will  stop executing
+
+/// If config file is not defined then code will  stop executing
 $config = @include_once($sourceFolder."/config.inc.php");
 
 /// If config file is not defined then code will stop executing
@@ -45,13 +59,15 @@ require_once($sourceFolder."/query.lib.php");
 /// connect to Database
 connectDB();
 
-
 /// Include all required libraries
 require_once($sourceFolder."/common.lib.php");
 require_once($sourceFolder."/parser.lib.php");
 require_once($sourceFolder."/template.lib.php");
 require_once($sourceFolder."/tags.lib.php");
 require_once($sourceFolder."/permissions.lib.php");
+require_once($sourceFolder."/groups.lib.php");
+require_once($sourceFolder."/authenticate.lib.php");
+
 
 parseAddress();
 /// Get The template from template.lib.php

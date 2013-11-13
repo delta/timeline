@@ -31,21 +31,5 @@ function addGroupToTag() {
 
 }
 
-function createTagForm() {
-
-}
-
-function deleteTagForm() {
-
-}
-
-function updateTagForm() {
-
-}
-
-function addGroupToTagForm() {
-
-}
-
 
 ?>

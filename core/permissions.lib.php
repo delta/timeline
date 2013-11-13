@@ -39,3 +39,7 @@ function getUsersInGroup($groupId) {
 function getGroupsFromUserId($userId) {
 
 }
+
+function checkPermissionForUser($userId,$tagId,$type='primary')  {
+    
+}

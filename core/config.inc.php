@@ -25,10 +25,10 @@ define("MYSQL_SERVER","localhost");
 define("MYSQL_USERNAME","root");
 
 // defining the password used to connect to the database.
-define("MYSQL_PASSWORD","pass");
+define("MYSQL_PASSWORD","vegeta@1993");
 
 // defining the name of the database to connect to.
-define("MYSQL_DATABASE","timeline");
+define("MYSQL_DATABASE","Timeline");
 
 // defining the user id of the administrator. WARNING: Only experts should alter this.
 define("ADMIN_USERID",1);

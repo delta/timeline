@@ -1,5 +1,5 @@
 <?php
-if(!defined('__TIMELINE__')) { 
+if(!defined('__TIMELINE__')) {
 	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
 	echo "<h1>403 Forbidden<h1><h4>You are not authorized to access the page.</h4>";
 	echo '<hr/>'.$_SERVER['SERVER_SIGNATURE'];
@@ -29,13 +29,29 @@ function displayerror($error_desc) {
 function displayinfo($error_desc) {
 	global $INFOSTRING;
 	$INFOSTRING .= "<div class=\"core-info\">$error_desc</div>";
-	
+
 }
 
 /** Used for giving warning */
 function displaywarning($error_desc) {
 	global $WARNINGSTRING;
 	$WARNINGSTRING .= "<div class=\"core-warning\">$error_desc</div>";
+}
+
+function addCONTENT($content) {
+	global $CONTENT;
+	$CONTENT .= $content;
+}
+
+function issetcheck(&$variable)
+{     if(is_array($variable))
+       foreach($variable as $key => $value)
+               if(isset($variables[$key]))
+              {  echo "Its working ......................................";
+                return true;
+               } 
+               else
+                return false;
 }
 
 function isValidEmail($email) {

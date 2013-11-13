@@ -19,7 +19,7 @@ if(!defined('__TIMELINE__')) {
 /**
  * Used to escape all Variables
  * Can be used for Array Variables(Like POST,GET)
- * Or for a single variable.	
+ * Or for a single variable.
  */
 
 /** used for Connection to Database */
@@ -42,17 +42,25 @@ function escape(&$variable) {
 function mysqlQuery($query) {
   $res = mysql_query($query) or displayerror(mysql_error());
   if(!$res) return false;
-  return $res; 
+  return $res;
 }
 
 function mysqlGetNoOfRows($resource) {
-
+  $rowCount = mysql_num_rows($resource);
+  if(!$rowCount) return 0;
+  return $rowCount;
 }
 
 function mysqlFetchArray($resource) {
+ $rowCount = mysql_fetch_array($resource);
+ if(!$rowCount)return 0;
+ return $rowCount;
 
 }
 
 function mysqlFetchAssoc($resource) {
+ $rowCount = mysql_fetch_assoc($resource);
+ if(!$rowCount)return 0;
+ return $rowCount;
 
 }

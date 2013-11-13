@@ -19,6 +19,7 @@ if(!defined('__TIMELINE__')) {
 
 function loginUser() {
   escape($_POST);
+  
 }
 
 function resetPassword() {
@@ -27,3 +28,12 @@ function resetPassword() {
 }
 
 
+function init($addressArr) {
+
+if(count($addressArr)==1) {
+$CONTENT.= loginUser();
+}
+else if($addressArr[1]=='resetPassword') {
+     $CONTENT.=resetPassword();
+}
+}

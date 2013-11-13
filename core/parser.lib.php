@@ -18,16 +18,29 @@ if(!defined('__TIMELINE__')) {
 
 /// Url Should be handled here
 function parseAddress() {
-  print_r($_GET);
+ global $action,$sourceFolder;
+ // print_r($_GET);
   $timelinePath=mapAddress();
   $pagePathArr=explode("/",$_GET['page']);
-  print_r($pagePathArr);
-  //  if(in_array(
-}
+  $callFunction = "get".$action;
+  if(isset($timelinePath[$action])) {
+    echo $callFunction."<br/>";
+     require_once($sourceFolder."/".$timelinePath[$action]);
+     $callFunction();
+  }
+  else {
+//    $CONTENT = get404();
+ }
+ }
 
 function mapAddress() {
   $timelinePath=array(
 		       "login" => "authenticate.lib.php",
-                       ""      => "");
+                       "admin" => "admin.lib.php",
+                       "graph" => "graph.lib.php",
+                       "contentedit" => "content.lib.php"
+                      
+                       );
+
   return $timelinePath;
 }
