@@ -126,8 +126,8 @@
         "primary_hashtag":"midfest"
       },
       {
-        "content_start":'2014-3-12 12:41:24',
-        "content_end":'2014-3-15 12:41:24' ,
+        "content_start":'2005-3-12 12:41:24',
+        "content_end":'2005-3-15 12:41:24' ,
         "primary_hashtag":"pragyan"
       }
     ];
@@ -541,8 +541,10 @@ function set_dateViewer(buffer){
       current_buffer[temp]["year"]=current_buffer[temp]["month"]=current_buffer[temp]["day"]=null;
     
   }  
+  var IS_TAG_CHOSEN=false;
   //highlights the tags inside a particular date pattern....
   function highlight_tags(){
+    
     var bool = false;
     if(!current_buffer){
       bool=true;
@@ -555,15 +557,17 @@ function set_dateViewer(buffer){
       if(currentMonth){
         for(var i=0;i<current_buffer.length;i++){
           if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["day"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="18px";
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+
           }
           else{
            if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&currentDay==current_buffer[i]["day"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="18px";
             $("#tagPicker label").css("opacity","0.5");
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F"); 
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("opacity","1"); 
+
           }
         }
         }
@@ -571,8 +575,9 @@ function set_dateViewer(buffer){
       else{
         for(var i=0;i<current_buffer.length;i++){
           if(currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["month"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="18px";
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+
           }
         }
       }
@@ -580,6 +585,7 @@ function set_dateViewer(buffer){
     else{
       for(var i=0;i<current_buffer.length;i++){
           if(current_display_block.getAttribute("data-meta")==current_buffer[i]["year"]){
+            console.log(current_buffer[i]);
             document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
           }
@@ -587,9 +593,10 @@ function set_dateViewer(buffer){
     }
     if(bool)
       current_buffer=null;
+  
   }
   $("#tagPicker label").click(search_primaryTag);
-  //if user clicks the tag,it sends an ajax request and process the reply...
+  //if user clicks the primary tag,it sends an ajax request and process the reply...
   function search_primaryTag(){
     if(this.style.fontWeight!="bold"){
       this.style.fontWeight="bold";
@@ -606,6 +613,7 @@ function set_dateViewer(buffer){
         tags_search.push(tags[i].id);
     }
     var temporary_array=[];
+    var alter_array=[];
      if(tags_search){
         for(var i=0;i<tags_search.length;i++){
           for(var j=i;j<tags_search.length;j++){
@@ -631,13 +639,35 @@ function set_dateViewer(buffer){
             if(tags_search[starting]!="tag"+recieved_reply[i]["primary_hashtag"])
               continue;
             temporary_array.push(recieved_reply[i]);
+            alter_array.push(i);
           }
       }
       currentYear=currentMonth=currentDay=null;
-      if(temporary_array.length==0)
+      if(temporary_array.length==0){
         current_buffer=null;
-      else
+      }
+      else{
         Parse_Reply_Backend(temporary_array);
+        var i=0;
+        console.log(current_buffer);
+        while(i<current_buffer.length){
+          var j=i;
+          while(j+1<current_buffer.length){
+            if(current_buffer[j]["id"]==current_buffer[j+1]["id"])
+              current_buffer[j]["id"]=alter_array[i];
+            else
+              break;
+            j++;
+          }
+          current_buffer[j]["id"]=alter_array[i];
+          if(j==i)
+            i++;
+          else
+            i=j;
+        }
+        current_buffer[current_buffer.length-1]=alter_array[alter_array.length-1];
+      }
+      
     implode();
     Call_Logic(current_buffer);
     Init();
