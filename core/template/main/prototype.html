@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="jquery.mCustomScrollbar.css" rel="stylesheet" type="text/css" />
     <style>
       #datePicker{
         width: 1000px;
@@ -13,16 +14,15 @@
       body{
         font-family: verdana;
         background-color: black;
+        overflow: hidden;
       }
       #datePicker div:nth-child(n+2) {
         vertical-align: middle;
         font-size: 80%;
         line-height: 100px;
-        color: black;
         border-radius: 5px;
-        box-shadow: 0px 0px 10px 5px #0066FF;
-        background-color:#ADD6FF;
-        border: 1px solid #888;
+        /*box-shadow: 0px 0px 10px 5px #0066FF;
+        background-color:#ADD6FF;*/
         width: 100px;
         height: 100px;
         position: absolute;
@@ -33,9 +33,9 @@
       #dateShower{
         width: 250px;
         height: 30px;
-        background-color:#ADD6FF;
+        /*background-color:#ADD6FF;*/
         border-radius: 5px;
-        box-shadow: 0px 0px 10px 5px #0066FF;
+        /*box-shadow: 0px 0px 10px 5px #0066FF;*/
         left: 375px;
         top: 150px;
         position: absolute;
@@ -48,36 +48,69 @@
       #tagPrimaryPicker{
         position: absolute;
         text-align: left;
-        left: 0px;
-        bottom: 100px;
-        width: 100px;
+        left: 5px;
+        bottom: 0px;
+        width: 130px;
+        overflow: auto;
+        height: 500px;
       }
       #tagSecondaryPicker{
         position: absolute;
-        width: 150px;
+        width: 130px;
         text-align: right;
         right: 0px;
-        bottom: 100px;
+        bottom: 0px;
+        height: 500px;
+        overflow: auto;
       }
       #tagPrimaryPicker label,#tagSecondaryPicker label{
         font-size: 20px;
         display: block;
         color: white;
         cursor: pointer;
-        color: #ADD6FF;
+        /*color: #ADD6FF;*/
       }
+      /*#miniature_timeline{
+        border: thin solid #ADD6FF;
+        background-color: black;
+        height: 50px;
+        width: 1300px;
+        position: relative;
+        margin: auto;
+        overflow: hidden;
+      }*/
     </style>
   </head>
   <body>
-    <div id="tagPrimaryPicker"><label id="tagfestember">festember</label><label id="tagpragyan">pragyan</label><label id="tagmidfest">midfest</label><label id="PNULLTAG" style="display:none"></label></div>
+    <select onchange="colour_change(this.value);"><option selected="selected" value=0>BLUE</option><option value=1>RED</option><option value=2>GREEN</option></select>
+    <div id="tagPrimaryPicker"><label id="tagfestember">festemberrrrrrrrrrrrrrrr</label><label id="tagpragyan">pragyan</label><label id="tagmidfest">midfest</label><label id="tagventura">ventura</label><label id="PNULLTAG" style="display:none"></label><label id="tagsportsfest">sportsfest</label></div>
     <div id="tagSecondaryPicker"><label id="tagevents">events</label><label id="tagworkshop">workshop</label><label id="taglecture">lecture</label><label id="SNULLTAG" style="display:none"></label></div>
     <div id='datePicker'><div id="dateShower"><select id='manualYear'></select> <select id='manualMonth'></select> <select id='manualDay'></select></div><div style="display:none" data-meta="-1"></div>
     </div>
-    <div id="miniature_timeline"></div>
+<!--    <div id="miniature_timeline"><canvas id="mycanvas" width="1300" height="50"></canvas></div> -->
     <script src="js/move.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/underscore.js"></script>
+    <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
     <script>
+    var color_picked=0;
+    var color_picker=[['#ADD6FF','#0066FF'],['#D6FFAD','#FF6600'],['#ADFFD6','#66FF00']];
+    function colour_change(temp){
+        if(temp==null)
+          temp=color_picked
+        color_picked=temp;
+        $('#tagPrimaryPicker label').css('color',color_picker[temp][0]);
+        $('#tagSecondaryPicker label').css('color',color_picker[temp][0]);
+        if(temp==2){
+        $('#tagPrimaryPicker label').css('color',color_picker[temp][1]);
+        $('#tagSecondaryPicker label').css('color',color_picker[temp][1]);
+        }
+        $('#dateShower').css('background-color',color_picker[temp][0]);
+        $('#dateShower').css('box-shadow','0px 0px 10px 5px '+color_picker[temp][1]);
+        $('#datePicker div:nth-child(n+2)').css('background-color',color_picker[temp][0]);
+        $('#datePicker div:nth-child(n+2)').css('box-shadow','0px 0px 10px 5px '+color_picker[temp][1]);
+      }
+      colour_change();
     var initial_click_posx=0;
     var time_wait=300; //sets time for throttle
     var pressit= _.throttle(function(e){if(e.keyCode==37) move1(1); else if(e.keyCode==39) move1(-1); else if(e.keyCode==8) back(); else if(e.keyCode==13) current_display_block.click();},time_wait);
@@ -107,7 +140,7 @@
     var isImploded = false;
     var multiplier=Array();
     var time = '0.5s';
-    //init_buffer is the default buffer of all days and months from 2000 to 2013
+    //init_buffer is the default buffer of all days and months from 2001 to 2013
     var init_buffer=Array();
     var current_display_block;
     //current buffer is the specific days which the backend replies for our queries...
@@ -144,8 +177,8 @@
       },
       {
         "id":4,
-        "content_start":'2005-3-12 6:11:24',
-        "content_end":'2005-3-15 7:21:24' ,
+        "content_start":'2007-3-12 6:11:24',
+        "content_end":'2007-3-15 7:21:24' ,
         "primary_hashtag":"pragyan",
         "secondary_hashtag":"workshop"
       }
@@ -171,6 +204,7 @@
       multiplier[i]=temp-alter;
   }
   move1(0);
+  //createCanvas(temp,alter);
   //the below was done for some look issues
   for(var i=2;i<divs.length;++i){
     divs[i].style.display='block';
@@ -210,10 +244,11 @@ function Dropbox_Change(e){
       if(!flag3)
         document.getElementById('yearnull').selected="selected";
       else{
-        if((flag1&&flag2&&flag3)||(flag3&&flag2)){
+        if((flag1&&flag2&&flag3)||(flag3&&flag2)||(flag3&&document.getElementById("manualDay").value=="")){
           currentYear=document.getElementById("manualYear").value;
+          if(flag2)
           currentMonth=document.getElementById("manualMonth").value;
-          if(flag1)
+          if(flag1||document.getElementById("manualDay").value!="")
             currentDay=document.getElementById("manualDay").value;
           implode();
           Call_Logic(current_buffer);
@@ -326,7 +361,7 @@ function set_dateViewer(buffer){
         day_buffer.push(i);
       for(var j=1;j<13;j++)
         month_buffer.push(j)
-      for(var k=2000;k<2014;k++)
+      for(var k=2001;k<=2013;k++)
         year_buffer.push(k);
     }
     else{
@@ -388,6 +423,7 @@ function set_dateViewer(buffer){
     }
     change_dateViewer();
     highlight_tags();
+    colour_change();
   }
 //implode is used to converge all the divs and destroy all the divs...use it during the transition from one layer to another
   function implode(){
@@ -510,7 +546,7 @@ function set_dateViewer(buffer){
   function create_default_init_buffer(specific){
     init_buffer=Array();
     if((!currentYear&&specific==null)||specific=="year"){
-      for(var i=2000;i<=2013;i++)
+      for(var i=2001;i<=2013;i++)
         init_buffer.push(i);
     }
     else if((!currentMonth&&specific==null)||specific=="month"){
@@ -532,7 +568,6 @@ function set_dateViewer(buffer){
       for(var i=0;i<recieved_reply.length;++i){
         var t = recieved_reply[i]["content_start"].split(/[- :]/);
         var start = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-        console.log(t);
         var t = recieved_reply[i]["content_end"].split(/[- :]/);
         var end = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
         while(start.getFullYear()!=end.getFullYear()||start.getMonth()!=end.getMonth()||start.getDate()!=(end.getDate()+1)){
@@ -728,6 +763,35 @@ function set_dateViewer(buffer){
         Call_Logic(current_buffer);
         Init();
   }
+  //for create the canvas for miniature timeline
+  /*function createCanvas(middle,alter){
+    var COLOUR_CODE = {"festember":"red","pragyan":"blue","midfest":"green"};
+    var canvas = document.getElementById('mycanvas');
+    var divs = document.getElementById('datePicker').getElementsByTagName('div');
+    var div = current_display_block;
+    document.getElementById('miniature_timeline').style.width=(divs.length-2)*100+'px';
+    canvas.style.width=(divs.length-2)*100+'px';
+    canvas.width=canvas.width
+    var stackArray=[];
+    if(!current_buffer){
+      var temp = currentYear==null?0:currentMonth==null?1:3;
+      for(var j=0;j<divs.length;j++){
+          stackArray[j]=0;
+          for(var i=0;i<recieved_reply.length;i++){
+            var t = recieved_reply[i]["content_start"].split(/[- :]/);
+            //console.log(t[temp]+divs[i].getAttribute('data-meta'));
+            if(divs[j].getAttribute('data-meta')==t[temp]){
+              if((currentYear!=null&&currentYear!=t[0])||((currentYear!=t[0])&&currentMonth!=null&&currentMonth!=t[1]))
+                continue;
+              var ctx=canvas.getContext("2d");
+              ctx.fillStyle=COLOUR_CODE[recieved_reply[i]["primary_hashtag"]];
+              ctx.fillRect((j-2)*100+6*(stackArray[j]),0,5,50);
+              stackArray[j]++;
+          }
+      }
+    }
+    }
+  }*/
   //Quick tips:
   //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so Call_Logic(buffer)
   //cool...now u have to Init these divs with Init()...if u want a specific div to be selected by default...set alter accordingly Init(alter)
@@ -749,8 +813,23 @@ function set_dateViewer(buffer){
 });
   window.onresize = function(){
     document.getElementById("datePicker").style.top=window.innerHeight-500+'px';
+  //  document.getElementById("miniature_timeline").style.top=window.innerHeight-510+'px';
   }
+  //document.getElementById("miniature_timeline").style.top=window.innerHeight-510+'px';
   document.getElementById("datePicker").style.top=window.innerHeight-500+'px';
+  $(window).load(function(){
+            $("#tagSecondaryPicker").mCustomScrollbar({
+               theme:"light-thin",
+               horizontalScroll:true,
+               verticalScroll:true
+              });
+            $("#tagPrimaryPicker").mCustomScrollbar({
+               horizontalScroll:true,
+               verticalScroll:true,
+                theme:"light-thin"
+              });
+      
+        });
     </script>
   </body>
 </html>
