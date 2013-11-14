@@ -6,9 +6,9 @@
         width: 1000px;
         height: 450px;
         overflow: hidden;
-        position: absolute;
-        left: 180px;
-        bottom:0px;
+        position: relative;
+        margin: auto;
+
       }
       body{
         font-family: verdana;
@@ -45,26 +45,35 @@
       #dateShower select{
         height: 25px;
       }
-      #tagPicker{
-        position: relative;
-        margin-left: auto;
-        margin-right: auto;
-        width: 700px;
-        text-align: center;
+      #tagPrimaryPicker{
+        position: absolute;
+        text-align: left;
+        left: 0px;
+        bottom: 100px;
+        width: 100px;
       }
-      #tagPicker label{
-        font-size: 13px;
+      #tagSecondaryPicker{
+        position: absolute;
+        width: 150px;
+        text-align: right;
+        right: 0px;
+        bottom: 100px;
+      }
+      #tagPrimaryPicker label,#tagSecondaryPicker label{
+        font-size: 20px;
+        display: block;
         color: white;
         cursor: pointer;
-        margin: 0px 5px 0px 5px;
         color: #ADD6FF;
       }
     </style>
   </head>
   <body>
-    <div id="tagPicker"><label id="tagfestember">festember</label><label id="tagpragyan">pragyan</label><label id="tagmidfest">midfest</label></div>
+    <div id="tagPrimaryPicker"><label id="tagfestember">festember</label><label id="tagpragyan">pragyan</label><label id="tagmidfest">midfest</label><label id="PNULLTAG" style="display:none"></label></div>
+    <div id="tagSecondaryPicker"><label id="tagevents">events</label><label id="tagworkshop">workshop</label><label id="taglecture">lecture</label><label id="SNULLTAG" style="display:none"></label></div>
     <div id='datePicker'><div id="dateShower"><select id='manualYear'></select> <select id='manualMonth'></select> <select id='manualDay'></select></div><div style="display:none" data-meta="-1"></div>
     </div>
+    <div id="miniature_timeline"></div>
     <script src="js/move.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/underscore.js"></script>
@@ -105,30 +114,40 @@
     var current_buffer;
     
    var recieved_reply=[
-      {
-        "content_start":'2013-11-29 12:41:24',
-        "content_end":'2013-12-2 12:41:24',
-        "primary_hashtag":"festember"
+      {  
+        "id":0,
+        "content_start":'2013-11-29 10:11:24',
+        "content_end":'2013-12-2 12:44:24',
+        "primary_hashtag":"festember",
+        "secondary_hashtag":"events"
+      },
+      { 
+        "id":1,
+        "content_start":'2013-3-9 5:34:24',
+        "content_end":'2013-3-13 23:41:24' ,
+        "primary_hashtag":"festember",
+        "secondary_hashtag":"workshop"
+      },
+      { 
+        "id":2,
+        "content_start":'2013-3-12 2:41:24',
+        "content_end":'2013-3-15 3:21:24' ,
+        "primary_hashtag":"pragyan",
+        "secondary_hashtag":"lecture"
       },
       {
-        "content_start":'2013-3-9 12:41:24',
-        "content_end":'2013-3-13 12:41:24' ,
-        "primary_hashtag":"festember"
+        "id":3,
+        "content_start":'2012-3-12 1:50:24',
+        "content_end":'2012-3-15 9:41:24' ,
+        "primary_hashtag":"midfest",
+        "secondary_hashtag":"events"
       },
       {
-        "content_start":'2013-3-12 12:41:24',
-        "content_end":'2013-3-15 12:41:24' ,
-        "primary_hashtag":"pragyan"
-      },
-      {
-        "content_start":'2012-3-12 12:41:24',
-        "content_end":'2012-3-15 12:41:24' ,
-        "primary_hashtag":"midfest"
-      },
-      {
-        "content_start":'2005-3-12 12:41:24',
-        "content_end":'2005-3-15 12:41:24' ,
-        "primary_hashtag":"pragyan"
+        "id":4,
+        "content_start":'2005-3-12 6:11:24',
+        "content_end":'2005-3-15 7:21:24' ,
+        "primary_hashtag":"pragyan",
+        "secondary_hashtag":"workshop"
       }
     ];
    // Parse_Reply_Backend(recieved_reply);
@@ -513,6 +532,7 @@ function set_dateViewer(buffer){
       for(var i=0;i<recieved_reply.length;++i){
         var t = recieved_reply[i]["content_start"].split(/[- :]/);
         var start = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+        console.log(t);
         var t = recieved_reply[i]["content_end"].split(/[- :]/);
         var end = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
         while(start.getFullYear()!=end.getFullYear()||start.getMonth()!=end.getMonth()||start.getDate()!=(end.getDate()+1)){
@@ -521,6 +541,7 @@ function set_dateViewer(buffer){
             current_buffer[temp]["month"]=start.getMonth()+1;
             current_buffer[temp]["day"]=start.getDate();
             current_buffer[temp]["id"]=i;
+            current_buffer[temp]["content-id"]=recieved_reply[i]["id"];
             temp++;
         start.setDate(start.getDate()+1);
       }
@@ -541,32 +562,42 @@ function set_dateViewer(buffer){
       current_buffer[temp]["year"]=current_buffer[temp]["month"]=current_buffer[temp]["day"]=null;
     
   }  
-  var IS_TAG_CHOSEN=false;
+  var IS_PRIMARY_TAG_CHOSEN=false;
+  var IS_SECONDARY_TAG_CHOSEN=false;
   //highlights the tags inside a particular date pattern....
   function highlight_tags(){
-    
+    if(IS_PRIMARY_TAG_CHOSEN||IS_SECONDARY_TAG_CHOSEN)
+      return;
     var bool = false;
     if(!current_buffer){
       bool=true;
       Parse_Reply_Backend(recieved_reply);
     }
-    $("#tagPicker label").css("font-size","13px");
-    $("#tagPicker label").css("text-shadow","0 0 0.0em #87F");
-    $("#tagPicker label").css("opacity","1");
+    $("#tagPrimaryPicker label").css("font-size","20px");
+    $("#tagPrimaryPicker label").css("text-shadow","0 0 0.0em #87F");
+    $("#tagPrimaryPicker label").css("opacity","1");
+    $("#tagSecondaryPicker label").css("font-size","20px");
+    $("#tagSecondaryPicker label").css("text-shadow","0 0 0.0em #87F");
+    $("#tagSecondaryPicker label").css("opacity","1");
     if(currentYear){
       if(currentMonth){
         for(var i=0;i<current_buffer.length;i++){
           if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["day"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="18px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
-
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
           }
           else{
            if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&currentDay==current_buffer[i]["day"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="18px";
-            $("#tagPicker label").css("opacity","0.5");
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
+            $("#tagPrimaryPicker label").css("opacity","0.5");
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F"); 
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("opacity","1"); 
+            $("#tagSecondaryPicker label").css("opacity","0.5");
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em #87F"); 
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("opacity","1"); 
 
           }
         }
@@ -575,8 +606,10 @@ function set_dateViewer(buffer){
       else{
         for(var i=0;i<current_buffer.length;i++){
           if(currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["month"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="18px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
 
           }
         }
@@ -586,8 +619,10 @@ function set_dateViewer(buffer){
       for(var i=0;i<current_buffer.length;i++){
           if(current_display_block.getAttribute("data-meta")==current_buffer[i]["year"]){
     //        console.log(current_buffer[i]);
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="16px";
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
             $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em #87F");
           }
         }
     }
@@ -595,9 +630,17 @@ function set_dateViewer(buffer){
       current_buffer=null;
   
   }
-  $("#tagPicker label").click(search_primaryTag);
-  //if user clicks the primary tag,it sends an ajax request and process the reply...
-  function search_primaryTag(){
+  var primary_tags_search = Array();
+  var secondary_tags_search = Array();
+  $("#tagPrimaryPicker label").click(search_Tag);
+  $("#tagSecondaryPicker label").click(search_Tag);
+  //if user clicks the primary tag
+  function search_Tag(){
+    tags_search = Array();
+    var key="";
+      var tags = this.parentNode.id=="tagPrimaryPicker"?document.getElementById("tagPrimaryPicker"):document.getElementById("tagSecondaryPicker");
+      tags = tags.getElementsByTagName("label");
+      key=this.parentNode.id=="tagPrimaryPicker"?"primary_hashtag":"secondary_hashtag";
     if(this.style.fontWeight!="bold"){
       this.style.fontWeight="bold";
       this.style.textDecoration="overline";
@@ -606,15 +649,12 @@ function set_dateViewer(buffer){
       this.style.fontWeight="";
       this.style.textDecoration="";   
     }
-    var tags = document.getElementById("tagPicker").getElementsByTagName("label");
-    var tags_search = Array();
     for(var i=0;i<tags.length;i++){
       if(tags[i].style.fontWeight=="bold")
         tags_search.push(tags[i].id);
     }
     var temporary_array=[];
-    var alter_array=[];
-     if(tags_search){
+     if(tags_search.length!=0){
         for(var i=0;i<tags_search.length;i++){
           for(var j=i;j<tags_search.length;j++){
             if(tags_search[j]>tags_search[j+1]){
@@ -624,57 +664,69 @@ function set_dateViewer(buffer){
             }
           }
         }
+            
         for(var i=0;i<recieved_reply.length;i++){
             var starting = 0;
             var ending =tags_search.length-1;
             while(starting!=ending){
+              if(tags_search[starting]=="tag"+recieved_reply[i][key]||tags_search[ending]=="tag"+recieved_reply[i][key])
+                break;
               var middle =Math.ceil((starting+ending)/2);
-              if(tags_search[middle]>"tag"+recieved_reply[i]["primary_hashtag"])
+              if(tags_search[middle]>"tag"+recieved_reply[i][key])
                 ending=middle-1;
-              else if(tags_search[middle]<"tag"+recieved_reply[i]["primary_hashtag"])
+              else if(tags_search[middle]<"tag"+recieved_reply[i][key])
                 starting=middle+1;
               else
                 starting=ending=middle;
-            }
-            if(tags_search[starting]!="tag"+recieved_reply[i]["primary_hashtag"])
+           } 
+            if(tags_search[starting]!="tag"+recieved_reply[i][key]&&tags_search[ending]!="tag"+recieved_reply[i][key])
               continue;
-            temporary_array.push(recieved_reply[i]);
-            alter_array.push(i);
+          
+            if(IS_SECONDARY_TAG_CHOSEN&&key=="primary_hashtag"){
+              for(var l=0;l<secondary_tags_search.length;l++){
+                if(recieved_reply[i]["secondary_hashtag"]==secondary_tags_search[l]["secondary_hashtag"])   {
+                  temporary_array.push(recieved_reply[i]);
+                  break;
+                }
+              }
+            }
+            else if(IS_PRIMARY_TAG_CHOSEN&&key=="secondary_hashtag"){
+              for(var l=0;l<primary_tags_search.length;l++)
+                if(recieved_reply[i]["primary_hashtag"]==primary_tags_search[l]["primary_hashtag"]){
+                  temporary_array.push(recieved_reply[i]);
+                  break;
+                }
+            }
+            else
+              temporary_array.push(recieved_reply[i]);
+            
           }
       }
+      if(key=="primary_hashtag")
+        primary_tags_search=temporary_array;
+      else
+        secondary_tags_search=temporary_array;
       currentYear=currentMonth=currentDay=null;
       if(temporary_array.length==0){
         current_buffer=null;
+        IS_PRIMARY_TAG_CHOSEN = key=="primary_hashtag"?false:IS_PRIMARY_TAG_CHOSEN?true:false;
+        IS_SECONDARY_TAG_CHOSEN = key=="secondary_hashtag"?false:IS_SECONDARY_TAG_CHOSEN?true:false;
+        if(IS_PRIMARY_TAG_CHOSEN)
+          document.getElementById('PNULLTAG').click();
+        else if(IS_SECONDARY_TAG_CHOSEN)
+          document.getElementById("SNULLTAG").click();
       }
       else{
         Parse_Reply_Backend(temporary_array);
         var i=0;
-        //console.log(current_buffer);
-        while(i<current_buffer.length){
-          var j=i;
-          while(j+1<current_buffer.length){
-            if(current_buffer[j]["id"]==current_buffer[j+1]["id"])
-              current_buffer[j]["id"]=alter_array[i];
-            else{
-              if(current_buffer[j-1]["id"]==alter_array[i])
-                current_buffer[j]["id"]=alter_array[i];
-              break;
-              
-            }
-            j++;
-          }
-          current_buffer[j]["id"]=alter_array[i];
-          if(j==i)
-            i++;
-          else
-            i=j;
-        }
-        current_buffer[current_buffer.length-1]=alter_array[alter_array.length-1];
+        IS_PRIMARY_TAG_CHOSEN = key=="primary_hashtag"?true:IS_PRIMARY_TAG_CHOSEN?true:false;
+        IS_SECONDARY_TAG_CHOSEN = key=="secondary_hashtag"?true:IS_SECONDARY_TAG_CHOSEN?true:false;
       }
-    console.log(current_buffer);
     implode();
-    Call_Logic(current_buffer);
-    Init();
+    $('#dateShower select').empty();
+        set_dateViewer(current_buffer);
+        Call_Logic(current_buffer);
+        Init();
   }
   //Quick tips:
   //if u want to create divs and u have a buffer like the one in the example...first create the divs with the buffer....so Call_Logic(buffer)
@@ -695,6 +747,10 @@ function set_dateViewer(buffer){
       }
   });         
 });
+  window.onresize = function(){
+    document.getElementById("datePicker").style.top=window.innerHeight-500+'px';
+  }
+  document.getElementById("datePicker").style.top=window.innerHeight-500+'px';
     </script>
   </body>
 </html>
