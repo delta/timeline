@@ -1,1 +1,0 @@
-Handles common js,images,css files.
