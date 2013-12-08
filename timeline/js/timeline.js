@@ -49,8 +49,8 @@ var color_picked=0;
     var current_display_block;
     //current buffer is the specific days which the backend replies for our queries...
     var current_buffer;
-  var recieved_primary_tags = ["festember","pragyan","nittfest","timeline"];
-  var recieved_secondary_tags = ["workshop","events","lecture","testing"];
+  //var recieved_primary_tags = ["festember","pragyan","nittfest","timeline"];
+  //var recieved_secondary_tags = ["workshop","events","lecture","testing"];
   /* var recieved_reply=[
       {  
         "id":3,
@@ -546,22 +546,31 @@ function set_dateViewer(buffer){
       if(currentMonth){
         for(var i=0;i<current_buffer.length;i++){
           if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["day"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);
+            for(var z=0;z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length||z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length;z++){
+              if(z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length){
+                document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).style.fontSize="25px";
+                $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);}
+              if(z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length){
+                document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).style.fontSize="25px";
+                $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);}
+            }
           }
           else{
            if(currentMonth==current_buffer[i]["month"]&&currentYear==current_buffer[i]["year"]&&currentDay==current_buffer[i]["day"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
             $("#tagPrimaryPicker label").css("opacity","0.5");
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]); 
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("opacity","1"); 
             $("#tagSecondaryPicker label").css("opacity","0.5");
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]); 
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("opacity","1"); 
-
+            for(var z=0;z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length||z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length;z++){
+              if(z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length){
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]); 
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).css("opacity","1"); 
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).style.fontSize="25px";
+          }
+              if(z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).style.fontSize="25px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]); 
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).css("opacity","1"); 
+            }
+          }
           }
         }
         }
@@ -569,11 +578,14 @@ function set_dateViewer(buffer){
       else{
         for(var i=0;i<current_buffer.length;i++){
           if(currentYear==current_buffer[i]["year"]&&current_display_block.getAttribute("data-meta")==current_buffer[i]["month"]){
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);
-
+            for(var z=0;z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length||z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length;z++){
+              if(z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length){
+                document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).style.fontSize="25px";
+                $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);}
+                if(z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length){
+                  document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).style.fontSize="25px";
+                  $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);}
+                  }
           }
         }
       }
@@ -581,11 +593,15 @@ function set_dateViewer(buffer){
     else{
       for(var i=0;i<current_buffer.length;i++){
           if(current_display_block.getAttribute("data-meta")==current_buffer[i]["year"]){
-    //        console.log(current_buffer[i]);
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).style.fontSize="25px";
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);
-            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).style.fontSize="25px";
-            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);
+            console.log(current_buffer[i]);
+        for(var z=0;z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length||z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length;z++){
+              if(z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).style.fontSize="25px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);}
+            if(z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length){
+            document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).style.fontSize="25px";
+            $("#tag"+recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"][z]).css("text-shadow","0 0 0.4em "+color_picker[color_picked][2]);}
+          }
           }
         }
     }
@@ -620,46 +636,30 @@ function set_dateViewer(buffer){
     }
     var temporary_array=[];
      if(tags_search.length!=0){
-        for(var i=0;i<tags_search.length;i++){
-          for(var j=i;j<tags_search.length;j++){
-            if(tags_search[j]>tags_search[j+1]){
-              var temp = tags_search[j];
-              tags_search[j]=tags_search[j+1];
-              tags_search[j+1]=temp;
-            }
-          }
-        }
         for(var i=0;i<recieved_reply.length;i++){
-            var starting = 0;
-            var ending =tags_search.length-1;
-            while(starting!=ending){
-              if(tags_search[starting]=="tag"+recieved_reply[i][key]||tags_search[ending]=="tag"+recieved_reply[i][key])
+            for(var j=0;j<tags_search.length;j++){
+              if(jQuery.inArray(tags_search[j].substr(3,tags_search[j].length),recieved_reply[i][key])!=-1)
                 break;
-              var middle =Math.ceil((starting+ending)/2);
-              if(tags_search[middle]>"tag"+recieved_reply[i][key])
-                ending=middle-1;
-              else if(tags_search[middle]<"tag"+recieved_reply[i][key])
-                starting=middle+1;
-              else
-                starting=ending=middle;
            } 
-            if(tags_search[starting]!="tag"+recieved_reply[i][key]&&tags_search[ending]!="tag"+recieved_reply[i][key])
-              continue;
-                      
+           if(j==tags_search.length)
+            continue;
             if(IS_SECONDARY_TAG_CHOSEN&&key=="primary_hashtag"){
               for(var l=0;l<secondary_tags_search.length;l++){
-                if(recieved_reply[i]["secondary_hashtag"]==secondary_tags_search[l]["secondary_hashtag"])   {
+                if(jQuery.inArray(secondary_tags_search[l]["secondary_hashtag"],recieved_reply[i]["secondary_hashtag"])!=-1)   {
                   temporary_array.push(recieved_reply[i]);
                   break;
                 }
               }
             }
             else if(IS_PRIMARY_TAG_CHOSEN&&key=="secondary_hashtag"){
-              for(var l=0;l<primary_tags_search.length;l++)
-                if(recieved_reply[i]["primary_hashtag"]==primary_tags_search[l]["primary_hashtag"]){
+              for(var l=0;l<primary_tags_search.length;l++){
+                console.log(recieved_reply[i]["primary_hashtag"]);
+                console.log(jQuery.inArray(primary_tags_search[l]["primary_hashtag"],recieved_reply[i]["primary_hashtag"]));
+                if(jQuery.inArray(primary_tags_search[l]["primary_hashtag"][0],recieved_reply[i]["primary_hashtag"])!=-1) {
                   temporary_array.push(recieved_reply[i]);
                   break;
                 }
+              }
             }
             else
               temporary_array.push(recieved_reply[i]);
