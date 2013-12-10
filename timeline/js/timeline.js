@@ -1,5 +1,5 @@
 var color_picked=0;
-    var color_picker=[["#02050e","#e5bf6e","#a28a58","#e5bf6e"],["#e8dae7","#d2dbb9","#828e58","#650458"],["#0b0000","#927b5d","#594020","#927b5d"],["#ded1d3","#93e393","#6fa762","#070921"],["#000000","#b4b4b4","#797979","#fafafa"]/*,["#ecedd8","#cea6b0","#ac3552","#3a1c07"]*/];
+    var color_picker=[["#02050e","#e5bf6e","#a28a58","#e5bf6e"],["#0b0000","#927b5d","#594020","#927b5d"],["#ded1d3","#93e393","#6fa762","#070921"],["#000000","#b4b4b4","#797979","#fafafa"]/*,["#ecedd8","#cea6b0","#ac3552","#3a1c07"]*/];
     t = setInterval(function(){colour_change('select')},50000);
     function colour_change(call){
           if(call=='select'){
@@ -12,12 +12,16 @@ var color_picked=0;
         $('body').css('background-color',color_picker[temp][0]);
         $('#tagPrimaryPicker label,#tagSecondaryPicker label').css('color',color_picker[temp][3]);
         $('#dateShower,#datePicker div:nth-child(n+2)').css('background-color',color_picker[temp][1]);
+        $('#timebox').css('backgroundColor',color_picker[color_picked][1]);
+        $('#timebox span').css('backgroundColor',color_picker[color_picked][2]);
+        $('#leftspan').css('backgroundColor',color_picker[color_picked][3]);
+        $('#rightspan').css('backgroundColor',color_picker[color_picked][3]);
         $('#dateShower,#datePicker div:nth-child(n+2)').css('box-shadow','0px 0px 10px 5px '+color_picker[temp][2]);
       }
       //colour_change("select");
     var initial_click_posx=0;
     var time_wait=300; //sets time for throttle
-    var pressit= _.throttle(function(e){if(e.keyCode==37) move1(1); else if(e.keyCode==39) move1(-1); else if(e.keyCode==8) back(); else if(e.keyCode==13) current_display_block.click();},time_wait);
+    var pressit= _.throttle(function(e){if(e.keyCode==37) move1(1); else if(e.keyCode==39) move1(-1); else if(e.keyCode==8) back(); else if(e.keyCode==13&&!currentDay) current_display_block.click();},time_wait);
     var holdclick= _.throttle(function(e){if((e.clientX-initial_click_posx)>=100) move1(-1); else if((e.clientX-initial_click_posx)<=-100) move1(1);},300);
   
     function clickdown(e)
@@ -136,11 +140,12 @@ var color_picked=0;
 //if user uses dropbox to change the date
 function Dropbox_Change(e){
       if(e){
-      var changed_variable = this.id=="manualDay"?"day":this.id=="manualMonth"?"month":"year"
+      var changed_variable = this.id=="manualDay"?"day":this.id=="manualMonth"?"month":this.id=="year"?"year":"day";
       var flag1=false,flag2=false,flag3=false;
       if(current_buffer){
+        var value = e!='Yo'?this.value:document.getElementById("manualDay").value;
         for(var i=0;i<current_buffer.length;i++){
-          if(current_buffer[i][changed_variable]==this.value){
+          if(current_buffer[i][changed_variable]==value){
             if(current_buffer[i]["day"]==document.getElementById("manualDay").value)
               flag1=true;
             if(current_buffer[i]["month"]==document.getElementById("manualMonth").value)
@@ -160,6 +165,11 @@ function Dropbox_Change(e){
       flag2 = document.getElementById("manualMonth").value?true:false;
       flag3 = document.getElementById("manualYear").value?true:false;
     }
+    if(e=="Yo"){
+      if(!(flag1&&flag2&&flag3)){
+        return -1;
+      }
+    }
       if(!flag1)
         document.getElementById('daynull').selected="selected";
       if(!flag2)
@@ -174,8 +184,15 @@ function Dropbox_Change(e){
           if(flag1||document.getElementById("manualDay").value!="")
             currentDay=document.getElementById("manualDay").value;
           implode();
+          if(currentDay){
+            $('#timebox').fadeOut();
+            Create_TimeLine();
+            return 1;
+          }
+          else{
           Call_Logic(current_buffer);
           Init();
+        }
       }
       }
       dropdown_highlighter(document.getElementById('manualYear').value,document.getElementById('manualMonth').value,document.getElementById('manualDay').value);
@@ -315,6 +332,10 @@ function set_dateViewer(buffer){
         //below condition so that it doesnt move when it reaches the end
         if((multiplier[2]==0&&addition==1)||(multiplier[divs.length-1]==0&&addition==-1))
           return;
+        if(currentDay){
+          arrowTransition(-1*addition);
+          return;
+        }
     /*    if(addition!=0){
           $('#mycanvas').animate({
             left :('+='+addition*100+'px')
@@ -412,25 +433,232 @@ function set_dateViewer(buffer){
       Div.appendChild(label);
       datePicker.appendChild(Div);
       Div.onclick = function(){
-         this.style.zIndex=100;
+         this.style.zIndex=50;
          implode();
         if(!currentYear){
           currentYear=this.getAttribute('data-meta');
           Call_Logic(current_buffer);
+          Init();
         }
         else if(!currentMonth){
           currentMonth=this.getAttribute('data-meta');
           Call_Logic(current_buffer);
+          Init();
         }
         else{
           currentDay=this.getAttribute('data-meta');
-          Call_Logic(current_buffer);
-          
+          //Call_Logic(current_buffer);
+          Create_TimeLine();
         }
-        Init();
       }
     }
   }
+  function Create_TimeLine(){
+    var timebox = document.createElement('div');
+    timebox.id='timebox';
+    timebox.style.width = '960px';
+    timebox.style.height='300px';
+    timebox.style.backgroundColor='black';
+    timebox.style.position='absolute';
+    timebox.style.bottom ='0px';
+    timebox.style.display='none';
+    timebox.style.left='20px';
+    timebox.style.borderRadius='0px';
+    for(var i=0;i<=22;i++){
+      var timeMarker = document.createElement('span');
+      timeMarker.className='timeMarker';
+      timeMarker.style.left=(i+1)*40+'px';
+      timebox.appendChild(timeMarker);
+    }
+    var datePicker = document.getElementById('datePicker');
+    for(var j=0;j<=24;j++){
+      var label = document.createElement('label');
+      if(j>9)
+        label.innerHTML=j;
+      else
+        label.innerHTML='0'+j;
+      label.style.fontSize='12px';
+      label.style.position='absolute';
+      label.style.bottom='300px';
+      label.zIndex=50;
+      label.style.left=13+40*j+'px';
+      label.style.color=color_picker[color_picked][2];
+      datePicker.appendChild(label);
+    }
+    datePicker.appendChild(timebox);
+    createSpans();
+    $('#timebox').css('backgroundColor',color_picker[color_picked][1]);
+    $('#timebox span').css('backgroundColor',color_picker[color_picked][2]);
+    var leftspan = document.createElement('span');
+    leftspan.style.width ='18px';
+    leftspan.id='leftspan';
+    leftspan.style.height ='300px';
+    leftspan.style.position='absolute';
+    leftspan.style.left='0px';
+    leftspan.style.bottom='0px';
+    leftspan.style.opacity='0.3';
+    leftspan.style.cursor='pointer';
+    var img = document.createElement('img');
+    img.src='images/left-arrow.gif';
+    img.style.position='absolute';
+    img.style.top='132px';
+    leftspan.appendChild(img);
+    datePicker.appendChild(leftspan);
+    $("#leftspan").click(function(){
+      arrowTransition(-1);
+    });
+    var rightspan = document.createElement('span');
+    rightspan.style.width ='18px';
+    rightspan.id='rightspan';
+    rightspan.style.height ='300px';
+    rightspan.style.position='absolute';
+    rightspan.style.right='0px';
+    rightspan.style.bottom='0px';
+    rightspan.style.opacity='0.3';
+    rightspan.style.cursor='pointer';
+    var img = document.createElement('img');
+    img.src='images/right-arrow.gif';
+    img.style.position='absolute';
+    img.style.top='132px';
+    rightspan.appendChild(img);
+    datePicker.appendChild(rightspan);
+    $("#rightspan").click(function(){
+      arrowTransition(1);
+    });
+    $('#leftspan').css('backgroundColor',color_picker[color_picked][3]);
+    $('#rightspan').css('backgroundColor',color_picker[color_picked][3]);
+    $('#timebox').fadeIn();
+  }
+  function arrowTransition(temp){
+      var date = new Date(currentYear,currentMonth-1,currentDay);
+      date.setDate(date.getDate()+temp);
+      var string = temp==1?"rightspan":"leftspan";
+      if(!(document.getElementById('year'+date.getFullYear())&&document.getElementById('month'+parseInt(date.getMonth()+1))&&document.getElementById('day'+date.getDate()))){
+        $('#'+string).css('backgroundColor','red');
+        t = setTimeout(function(){$('#leftspan,#rightspan').css('backgroundColor',color_picker[color_picked][3]);},100);
+        return;
+      }
+      document.getElementById('year'+date.getFullYear()).selected="selected";
+      document.getElementById('month'+parseInt(date.getMonth()+1)).selected="selected";
+      document.getElementById('day'+date.getDate()).selected="selected";
+        var status = Dropbox_Change('Yo');
+        if(status==-1){
+          $('#'+string).css('backgroundColor','red');
+          t = setTimeout(function(){$('#leftspan,#rightspan').css('backgroundColor',color_picker[color_picked][3]);},100);
+          date.setDate(date.getDate()-temp);
+          document.getElementById('year'+date.getFullYear()).selected="selected";
+          document.getElementById('month'+parseInt(date.getMonth()+1)).selected="selected";
+          document.getElementById('day'+date.getDate()).selected="selected";
+        }
+  }
+  function createSpans(){
+    var buffer=Array();
+    if(current_buffer){
+    var temp=Array();
+      for(j=0;j<current_buffer.length-1;j++){
+        if(jQuery.inArray(current_buffer[j]['id'],temp)!=-1)
+          continue;
+        temp.push(current_buffer[j]['id']);
+        for (var i = recieved_reply.length - 1; i >= 0; i--) {
+          console.log(recieved_reply[i]["id"]+","+current_buffer[j]["content-id"]);
+          if(recieved_reply[i]["id"]==current_buffer[j]["content-id"]){
+            buffer.push(recieved_reply[i]);
+            break;
+          }
+        };
+      }
+    }
+    else
+      buffer = recieved_reply;
+    var ht=0;
+    for(var i=0;i<buffer.length;i++){
+        var t1 = buffer[i]["content_start"].split(/[- :]/);
+        var Startdate = new Date(t1[0], t1[1]-1, t1[2], t1[3], t1[4], t1[5]);
+        var t2 = buffer[i]["content_end"].split(/[- :]/);
+        var Enddate = new Date(t2[0], t2[1]-1, t2[2], t2[3], t2[4], t2[5]);
+      if(currentYear==Startdate.getFullYear()&&currentMonth==Startdate.getMonth()+1&&currentDay==Startdate.getDate()){
+        if(currentYear==Enddate.getFullYear()&&currentMonth==Enddate.getMonth()+1&&currentDay==Enddate.getDate()){
+            GenerateSpan('current',buffer[i],ht,t1[3],t1[4],t2[3],t2[4]);
+            ht++;
+        }
+        else{
+            GenerateSpan('start',buffer[i],ht,t1[3],t1[4]);
+            ht++;
+        }
+      }
+      else if(currentYear==Enddate.getFullYear()&&currentMonth==Enddate.getMonth()+1&&currentDay==Enddate.getDate()){
+            GenerateSpan('ends',buffer[i],ht,t2[3],t2[4]);
+            ht++;
+      }
+      else if(currentYear>=Startdate.getFullYear()&&currentMonth>=Startdate.getMonth()+1&&currentDay>Startdate.getDate()){
+        if(currentYear<=Enddate.getFullYear()&&(currentMonth<=Enddate.getMonth()+1)&&currentDay<Enddate.getDate()){
+          GenerateSpan('full',buffer[i],ht);
+          ht++;
+        }
+
+      }
+    }
+    //GenerateSpan('full',buffer[i-1],ht);
+  }
+  function GenerateSpan(option,data,height,hour,mint,ohour,omint){
+      var span = document.createElement('span');
+      span.className='timeboxspan';
+      span.innerHTML=data["title"]+'   ';
+      for(var i=0;i<data["primary_hashtag"].length;i++)
+        span.innerHTML=span.innerHTML+'#'+data["primary_hashtag"][i]+' ';
+      for(var i=0;i<data["secondary_hashtag"].length;i++)
+        span.innerHTML=span.innerHTML+'#'+data["secondary_hashtag"][i]+' ';
+      if(hour!=null)
+      var temp1=(parseInt(hour)+parseInt(mint/60))*40;
+      if(ohour!=null)
+        var temp2=(parseInt(ohour)+parseInt(omint/60))*40;
+      if(option=='current'){
+        span.style.width=(temp2-temp1)+'px';
+        span.style.left=temp1+'px';
+      }
+      else if(option=='start'){
+        span.style.width=(960-temp1)+'px';
+        span.style.left=temp1+'px';
+      }
+      else if(option=='ends'){
+        span.style.width=temp1+'px';
+        span.style.left='0px';
+      }
+      else{
+        span.style.width='960px';
+        span.style.left='0px';
+      }
+      $(span).hover(function(){this.style.opacity='1'},function(){this.style.opacity='0.8'});
+      $(span).click(function(){
+        document.getElementById('lightbox-title').innerHTML=data["title"];
+        document.getElementById('lightbox-time').innerHTML = data["content_start"]+' to '+data["content_end"];
+        for(var i=0;i<data["primary_hashtag"].length;i++)
+           document.getElementById('lightbox-tags').innerHTML+='#'+data["primary_hashtag"][i]+' ';
+        for(var i=0;i<data["secondary_hashtag"].length;i++)
+           document.getElementById('lightbox-tags').innerHTML+='#'+data["secondary_hashtag"][i]+' ';
+         document.getElementById('lightbox-description').innerHTML=data["content_desc"];
+        document.getElementById('lightbox').style.opacity=0;
+        document.getElementById('lightbox').style.display='block';
+         $(lightbox).animate({
+          opacity:0.8,
+          height:window.innerHeight
+         });
+      });
+      span.style.top=height*32+'px';
+      if(height==0)
+        span.style.top='10px';
+      document.getElementById('timebox').appendChild(span);
+  }
+  $('#lightbox').click(function(){
+    document.getElementById('lightbox-title').innerHTML='';
+    document.getElementById('lightbox-description').innerHTML='';
+    document.getElementById('lightbox-time').innerHTML = '';
+    document.getElementById('lightbox-tags').innerHTML='';
+    $(lightbox).animate({
+          opacity:0,
+          height:0
+         });
+  });
   var position_buffer;
   //back is used to go back one layer
   function back(){
@@ -593,7 +821,6 @@ function set_dateViewer(buffer){
     else{
       for(var i=0;i<current_buffer.length;i++){
           if(current_display_block.getAttribute("data-meta")==current_buffer[i]["year"]){
-            console.log(current_buffer[i]);
         for(var z=0;z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length||z<recieved_reply[current_buffer[i]["id"]]["secondary_hashtag"].length;z++){
               if(z<recieved_reply[current_buffer[i]["id"]]["primary_hashtag"].length){
             document.getElementById("tag"+recieved_reply[current_buffer[i]["id"]]["primary_hashtag"][z]).style.fontSize="25px";
@@ -653,8 +880,6 @@ function set_dateViewer(buffer){
             }
             else if(IS_PRIMARY_TAG_CHOSEN&&key=="secondary_hashtag"){
               for(var l=0;l<primary_tags_search.length;l++){
-                console.log(recieved_reply[i]["primary_hashtag"]);
-                console.log(jQuery.inArray(primary_tags_search[l]["primary_hashtag"],recieved_reply[i]["primary_hashtag"]));
                 if(jQuery.inArray(primary_tags_search[l]["primary_hashtag"][0],recieved_reply[i]["primary_hashtag"])!=-1) {
                   temporary_array.push(recieved_reply[i]);
                   break;

@@ -8,7 +8,15 @@
     <link href="css/timeline.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <a href="admin/admin.php" target="_blank" id="admin"> admin</a>
+    <a href="admin/admin.php" target="_blank" id="admin">Admin</a>
+    <div id='lightbox'>
+      <center>
+        <h3 id='lightbox-title'></h3>
+        <h5 id='lightbox-time'></h5>
+        <h6 id='lightbox-tags'></h6>
+        <div id='lightbox-description'></div>
+      </center>
+    </div>
     <img src="./images/color_pallete.png" onclick="colour_change('select');" width="20px" id="colorPallete">
     <div id="tagPrimaryPicker"><label class="tagPrimary" id="PNULLTAG" style="display:none"></label></div>
     <div id="tagSecondaryPicker"><label class="tagSecondary" id="SNULLTAG" style="display:none"></label></div>

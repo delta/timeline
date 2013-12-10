@@ -4,12 +4,47 @@
         overflow: hidden;
         position: relative;
         margin: auto;
-
       }
       body{
         font-family: verdana;
         background-color: black;
         overflow: hidden;
+      }
+      .timeboxspan{
+        line-height: 150%;
+        text-align: left;
+        padding-left: 5px;
+        overflow:hidden;
+        height: 20px;
+        opacity: 0.8;
+        cursor: pointer;
+        position: absolute;
+        z-index: 50;
+      }
+      #lightbox{
+        display: none;
+        color: white;
+        opacity: 0.7;
+        left:0px;
+        background-color: black;
+        position: absolute;
+        z-index: 100;
+        top:0px;
+        width: 100%;
+      }
+      #admin{
+        position: absolute;
+        right: 0px;
+        color: blue;
+        font-size: 75%;
+        text-decoration: none;
+      }
+      .timeMarker{
+        position: absolute;
+        width: 2px;
+        z-index: 0;
+        height: 100%;
+        background-color: black;
       }
       #datePicker div:nth-child(n+2) {
         vertical-align: middle;
@@ -28,7 +63,7 @@
         height: 30px;
         border-radius: 5px;
         left: 375px;
-        top: 150px;
+        top: 90px;
         position: absolute;
         text-align: center;
         padding-top: 5px;
